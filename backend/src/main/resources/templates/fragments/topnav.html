@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="topnav" class="navbar navbar-expand-md d-none d-lg-flex d-print-none">
+    <div class="container-xl">
+        <div class="navbar-nav flex-row order-md-last">
+
+            <!-- 알림 -->
+            <div class="d-none d-md-flex">
+                <a href="/notifications" class="nav-link px-0" title="알림">
+                    <i class="ti ti-bell"></i>
+                </a>
+            </div>
+
+            <!-- 사용자 메뉴 -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
+                    <span class="avatar avatar-sm bg-blue-lt">관리</span>
+                    <div class="d-none d-xl-block ps-2">
+                        <div th:text="${session.userName} ?: '관리자'">관리자</div>
+                        <div class="mt-1 small text-muted" th:text="${session.roleName} ?: 'SUPER_ADMIN'">SUPER_ADMIN</div>
+                    </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <a href="/sys/users/me" class="dropdown-item">내 정보</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="dropdown-item">로그아웃</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-menu">
+            <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
+                <!-- breadcrumb 자리 -->
+                <ol class="breadcrumb breadcrumb-arrows mb-0" aria-label="breadcrumbs">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" th:text="${pageTitle} ?: '대시보드'">대시보드</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</header>
+</body>
+</html>

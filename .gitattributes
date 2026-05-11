@@ -1,0 +1,21 @@
+# Normalize line endings — Windows 작업물도 LF로 통일
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.xlsx binary
+*.xls binary
+
+# Shell scripts must stay LF
+*.sh text eol=lf
+gradlew text eol=lf
+
+# Windows batch must stay CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf

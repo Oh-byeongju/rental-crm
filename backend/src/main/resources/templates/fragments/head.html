@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title th:text="${pageTitle ?: 'rental-crm'} + ' | 장비 렌탈 CRM'">rental-crm</title>
+
+    <!-- ===== Tabler CSS (Bootstrap 5 기반 어드민 템플릿) ===== -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler-vendors.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css" rel="stylesheet"/>
+
+    <!-- ===== AG Grid CSS ===== -->
+    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-grid.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-theme-quartz.css" rel="stylesheet"/>
+
+    <!-- 사용자 정의 CSS — Thymeleaf @{} 로 운영 시 자동 콘텐츠 해시 부여 -->
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+</html>

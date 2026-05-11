@@ -1,0 +1,155 @@
+# rental-crm 인프라 — Oracle 21c + Kafka + Zookeeper + Redis + Kafka UI
+#
+# 실행: docker compose up -d
+# 정지: docker compose stop          (데이터 유지)
+# 제거: docker compose down          (컨테이너 제거, 볼륨 유지)
+# 완전제거: docker compose down -v   (⚠️ 볼륨까지 제거 — DB 데이터 삭제됨)
+#
+# 환경변수: 동일 디렉토리의 .env 파일 자동 로드 (.env.example 참조)
+
+services:
+  # ============================================================
+  # Oracle Database 21c (Express Edition free)
+  # ============================================================
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: rental-oracle
+    ports:
+      - "${ORACLE_PORT:-1521}:1521"
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-oracle}
+      # ORACLE_DATABASE 미설정 — 기본 PDB(XEPDB1) 그대로 사용. 설정 시 새 PDB 생성 시도 → 이름 충돌
+      APP_USER: ${ORACLE_APP_USER:-rental}
+      APP_USER_PASSWORD: ${ORACLE_APP_PASSWORD:-rental}
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./init-scripts/oracle:/container-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 8m
+    restart: unless-stopped
+    networks:
+      - rental-network
+
+  # ============================================================
+  # Zookeeper (Kafka 메타데이터 관리)
+  # ============================================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: rental-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - rental-network
+
+  # ============================================================
+  # Kafka (메시지 브로커)
+  # 내부 통신: kafka:29092 (컨테이너 간)
+  # 외부 통신: localhost:9092 (호스트 → 컨테이너)
+  # ============================================================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: rental-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - rental-network
+
+  # ============================================================
+  # Kafka 토픽 초기 생성 (one-shot)
+  # depends_on 으로 kafka 가 healthy 된 후 실행되고 즉시 종료
+  # ============================================================
+  kafka-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: rental-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "/scripts/create-topics.sh"]
+    volumes:
+      - ./init-scripts/kafka:/scripts:ro
+    networks:
+      - rental-network
+    restart: "no"
+
+  # ============================================================
+  # Redis (캐시 / 세션)
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: rental-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - rental-network
+
+  # ============================================================
+  # Kafka UI (학습/디버깅용 — 토픽·메시지·컨슈머 시각화)
+  # 접속: http://localhost:8090
+  # ============================================================
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: rental-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "${KAFKA_UI_PORT:-8090}:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: rental
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    restart: unless-stopped
+    networks:
+      - rental-network
+
+volumes:
+  oracle-data:
+    name: rental-oracle-data
+  redis-data:
+    name: rental-redis-data
+
+networks:
+  rental-network:
+    name: rental-network
+    driver: bridge

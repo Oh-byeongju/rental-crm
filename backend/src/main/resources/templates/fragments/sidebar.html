@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar" class="navbar navbar-vertical navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="/" class="text-decoration-none">
+                <i class="ti ti-package me-2"></i>
+                rental-crm
+            </a>
+        </h1>
+        <div class="collapse navbar-collapse" id="sidebar-menu">
+            <ul class="navbar-nav pt-lg-3">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <span class="nav-link-icon"><i class="ti ti-home"></i></span>
+                        <span class="nav-link-title">대시보드</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                        <span class="nav-link-icon"><i class="ti ti-settings"></i></span>
+                        <span class="nav-link-title">공통관리</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/sys/codes">공통코드</a>
+                        <a class="dropdown-item" href="/sys/roles">권한</a>
+                        <a class="dropdown-item" href="/sys/menus">메뉴</a>
+                        <a class="dropdown-item" href="/sys/users">관리자 계정</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/customers">
+                        <span class="nav-link-icon"><i class="ti ti-users"></i></span>
+                        <span class="nav-link-title">고객 관리</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                        <span class="nav-link-icon"><i class="ti ti-box"></i></span>
+                        <span class="nav-link-title">장비 / 상품</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/equipments">장비 관리</a>
+                        <a class="dropdown-item" href="/products">상품 관리</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/contracts">
+                        <span class="nav-link-icon"><i class="ti ti-file-text"></i></span>
+                        <span class="nav-link-title">계약 관리</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                        <span class="nav-link-icon"><i class="ti ti-tool"></i></span>
+                        <span class="nav-link-title">기사 관리</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/engineers">기사 목록</a>
+                        <a class="dropdown-item" href="/visits">방문 이력</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                        <span class="nav-link-icon"><i class="ti ti-receipt"></i></span>
+                        <span class="nav-link-title">청구 관리</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/billings">청구 목록</a>
+                        <a class="dropdown-item" href="/billings/batch">월 청구 생성 (배치)</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/payments">
+                        <span class="nav-link-icon"><i class="ti ti-credit-card"></i></span>
+                        <span class="nav-link-title">수납 관리</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/overdues">
+                        <span class="nav-link-icon"><i class="ti ti-alert-triangle"></i></span>
+                        <span class="nav-link-title">연체 관리</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/notifications">
+                        <span class="nav-link-icon"><i class="ti ti-bell"></i></span>
+                        <span class="nav-link-title">알림 내역</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                        <span class="nav-link-icon"><i class="ti ti-chart-bar"></i></span>
+                        <span class="nav-link-title">통계 / 리포트</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/reports/billing">청구 현황 엑셀</a>
+                        <a class="dropdown-item" href="/reports/overdue">미납 현황 엑셀</a>
+                        <a class="dropdown-item" href="/reports/payment/monthly">월별 수납 통계</a>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</aside>
+</body>
+</html>

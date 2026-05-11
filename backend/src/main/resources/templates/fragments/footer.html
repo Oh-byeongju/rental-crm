@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="scripts">
+    <!-- ===== Tabler JS (Bootstrap 5 + Tabler 컴포넌트) ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+
+    <!-- ===== AG Grid JS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.js"></script>
+
+    <!-- ===== Chart.js (대시보드) ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <!-- 사용자 정의 공통 JS — @{} 로 운영 시 자동 콘텐츠 해시 부여 -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/grid-defaults.js}"></script>
+</div>
+</body>
+</html>

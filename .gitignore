@@ -1,0 +1,48 @@
+# ===== Build outputs =====
+backend/build/
+backend/.gradle/
+backend/out/
+backend/bin/
+customer-portal/node_modules/
+customer-portal/dist/
+customer-portal/build/
+customer-portal/.vite/
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ===== Environment / secrets =====
+**/application-local.yml
+**/application-local.properties
+**/application-secret.yml
+**/.env
+**/.env.local
+**/.env.*.local
+
+# ===== Docker volumes (NEVER commit DB data) =====
+infra/data/
+infra/oracle-data/
+infra/kafka-data/
+infra/redis-data/
+
+# ===== Logs =====
+**/*.log
+**/logs/
+
+# ===== Claude personal settings =====
+.claude/settings.local.json
+.claude/scratch/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Test / coverage =====
+**/coverage/
+**/.nyc_output/
+**/test-results/

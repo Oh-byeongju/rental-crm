@@ -1,0 +1,34 @@
+{
+  "folders": [
+    { "name": "📦 backend",  "path": "backend" },
+    { "name": "🎨 portal",   "path": "customer-portal" },
+    { "name": "🐳 infra",    "path": "infra" },
+    { "name": "📄 docs",     "path": "docs" },
+    { "name": "🤖 rules",    "path": ".claude/rules" },
+    { "name": "🏠 root",     "path": "." }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.gradle": true,
+      "**/build": true,
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.idea": true
+    },
+    "search.exclude": {
+      "**/.gradle": true,
+      "**/build": true,
+      "**/node_modules": true,
+      "**/dist": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "vscjava.vscode-java-pack",
+      "vmware.vscode-boot-dev-pack",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-azuretools.vscode-docker"
+    ]
+  }
+}

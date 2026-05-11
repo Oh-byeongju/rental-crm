@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('대시보드')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <!-- 페이지 헤더 -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">개요</div>
+                        <h2 class="page-title">대시보드</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이지 본문 -->
+        <div class="page-body">
+            <div class="container-xl">
+
+                <!-- 4개 위젯 카드 -->
+                <div class="row row-deck row-cards mb-4">
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="bg-primary text-white avatar">
+                                            <i class="ti ti-file-text"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="font-weight-medium" th:text="${summary?.totalActiveContracts ?: 0}">0</div>
+                                        <div class="text-muted">전체 활성 계약</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="bg-cyan text-white avatar">
+                                            <i class="ti ti-receipt"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="font-weight-medium" th:text="${summary?.thisMonthBillingCount ?: 0}">0</div>
+                                        <div class="text-muted">이번 달 청구 건수</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="bg-orange text-white avatar">
+                                            <i class="ti ti-alert-triangle"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="font-weight-medium">
+                                            <span th:text="${summary?.unpaidCount ?: 0}">0</span>
+                                            <span class="text-muted small">건</span>
+                                        </div>
+                                        <div class="text-muted">미납 건수</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card card-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <span class="bg-green text-white avatar">
+                                            <i class="ti ti-cash"></i>
+                                        </span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="font-weight-medium" th:text="${#numbers.formatInteger(summary?.thisMonthPaymentAmount ?: 0, 3, 'COMMA')} + ' 원'">0 원</div>
+                                        <div class="text-muted">이번 달 수납액</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 차트 영역 -->
+                <div class="row row-cards">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">월별 수납 추이</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="paymentTrendChart" style="height:300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">청구 상태 분포</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="billingStatusChart" style="height:300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>
