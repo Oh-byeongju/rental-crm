@@ -24,6 +24,14 @@ CREATE INDEX IDX_CM_NOTIFICATION_UNREAD
 CREATE INDEX IDX_CM_NOTIFICATION_RECIPIENT
     ON CM_NOTIFICATION (RECIPIENT_USER_ID, FIRS_REG_DTS DESC);
 
+-- 메뉴별 권한 조회 (ADR-008 — AUTH 키 단위)
+CREATE INDEX IDX_CM_AUTH_MENU
+    ON CM_AUTH (MENU_ID, SORT_ORDER);
+
+-- 사용자별 권한 조회 (ADR-009 — GRANT/REVOKE)
+CREATE INDEX IDX_CM_USER_AUTH_USER
+    ON CM_USER_AUTH (USER_ID);
+
 -- ============================================================
 -- CT_* 인덱스
 -- ============================================================
@@ -116,6 +124,6 @@ CREATE INDEX IDX_BL_BATCH_LOG_TYPE_STATUS
 -- 완료 메시지
 -- ============================================================
 BEGIN
-    DBMS_OUTPUT.PUT_LINE('rental-crm indexes created: 22 secondary indexes');
+    DBMS_OUTPUT.PUT_LINE('rental-crm indexes created: 24 secondary indexes');
 END;
 /

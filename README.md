@@ -88,7 +88,7 @@ rental-crm/
 │   └── domain-terms/          # 도메인 용어집 (접미어/한↔영)
 ├── infra/                     # Docker Compose 인프라
 │   ├── docker-compose.yml     # Oracle + Kafka + Zookeeper + Redis + Kafka UI
-│   ├── init-scripts/oracle/   # 17 테이블 + 시퀀스 + 인덱스 + 시드 데이터 DDL
+│   ├── init-scripts/oracle/   # 19 테이블 + 시퀀스 + 인덱스 + 시드 데이터 DDL
 │   ├── start.bat / stop.bat / status.bat / reset.bat   # Windows 더블클릭 운영
 │   └── guide/                 # 인프라 로컬 가이드
 ├── backend/                   # Spring Boot 3.5 + Java 21
@@ -154,7 +154,7 @@ reset.bat                  # YES 입력 필요
 ### Phase 1 — 백오피스 (현재 집중)
 
 - [x] 기획·요구사항·기술스택·기능명세·ERD·API 명세·배포 가이드 (산출물 8개)
-- [x] 17 테이블 ERD 컨펌 (ADR-001/002/003)
+- [x] 19 테이블 ERD 컨펌 (ADR-001/002/003 + ADR-008/009 권한 모델 갱신)
 - [x] 인프라 (Docker Compose + DDL + 시드 데이터)
 - [x] Spring Boot 스켈레톤 + JPA Auditing (감사 9컬럼 자동 주입)
 - [x] 공통 응답 포맷 / 예외 처리 / Security 기본
@@ -184,6 +184,9 @@ reset.bat                  # YES 입력 필요
 | [ADR-005](backend/guide/decisions/ADR-005-audit-columns-auto-injection.md) | 감사 9컬럼 자동 주입 — JPA Auditing + `@PrePersist`/`@PreUpdate` 혼합 |
 | [ADR-006](backend/guide/decisions/ADR-006-spring-boot-version.md) | Spring Boot 3.5.0 + Java 21 채택 (4.x 비채택 사유) |
 | [ADR-007](docs/decisions/ADR-007-ui-template-and-grid-library.md) | UI 템플릿 (Tabler) + 그리드 (AG Grid Community / TanStack Table) |
+| [ADR-008](docs/decisions/ADR-008-permission-model-auth-code.md) | 권한 모델 — 메뉴 × R/W/D 폐기, AUTH 키 단위 채택 (`CM_AUTH` / `CM_ROLE_AUTH`) |
+| [ADR-009](docs/decisions/ADR-009-user-direct-auth-grant-revoke.md) | 사용자 직접 권한 매핑 — 역할 폭증 회피 (`CM_USER_AUTH` GRANT/REVOKE) |
+| [ADR-010](docs/decisions/ADR-010-permission-cache-and-operations.md) | 권한 캐시 (`permissions:user:{userId}` 30분) + invalidation + 회수 SLA (다음 요청부터 즉시) |
 
 전역 룰: [docs/global-rules/](docs/global-rules/) | 도메인 용어집: [docs/domain-terms/](docs/domain-terms/)
 
