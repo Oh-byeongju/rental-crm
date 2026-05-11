@@ -95,8 +95,8 @@ for /f "tokens=* delims= " %%a in ("!TABLE_CNT!") do set TABLE_CNT=%%a
 
 echo [INFO] RENTAL 스키마 테이블 개수: !TABLE_CNT!
 
-if "!TABLE_CNT!"=="17" (
-    echo [OK]   스키마 정상 ^(17개 테이블 확인^). fallback 스킵.
+if "!TABLE_CNT!"=="19" (
+    echo [OK]   스키마 정상 ^(19개 테이블 확인^). fallback 스킵.
     goto skip_fallback
 )
 
@@ -105,7 +105,7 @@ if "!TABLE_CNT!"=="0" (
     goto run_fallback
 )
 
-echo [WARN] 테이블 개수가 예상 ^(17^) 과 다름: !TABLE_CNT!
+echo [WARN] 테이블 개수가 예상 ^(19^) 과 다름: !TABLE_CNT!
 echo        부분 실행된 상태일 수 있습니다. 수동 검증 권장.
 echo        강제 재실행을 원하면 reset.bat 후 start.bat 재실행.
 goto skip_fallback

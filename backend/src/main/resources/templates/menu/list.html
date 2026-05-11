@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('메뉴 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <!-- 페이지 헤더 -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">시스템관리</div>
+                        <h2 class="page-title">메뉴 관리</h2>
+                        <p class="text-secondary mt-1">2-depth 트리. GROUP(자식 펼침) / LEAF(페이지 이동).</p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary" onclick="MenuForm.openCreate()">
+                                <i class="ti ti-plus"></i> 메뉴 등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 본문 -->
+        <div class="page-body">
+            <div class="container-xl">
+
+                <!-- 검색 카드 -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return MenuList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">메뉴명</label>
+                                <input type="text" name="menuName" class="form-control" placeholder="고객">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">타입</label>
+                                <select name="menuType" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="GROUP">GROUP</option>
+                                    <option value="LEAF">LEAF</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">사용여부</label>
+                                <select name="useYn" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="Y" selected>사용</option>
+                                    <option value="N">미사용</option>
+                                </select>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="MenuList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 그리드 카드 -->
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="menuGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 메뉴 등록/수정 모달 ===== -->
+<div class="modal modal-blur fade" id="menuModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="menuModalTitle">메뉴 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="menuForm">
+                    <input type="hidden" name="menuId">
+                    <div class="row g-2">
+                        <div class="col-md-6" id="parentRow">
+                            <label class="form-label">상위 GROUP</label>
+                            <select name="parentMenuId" id="parentSelect" class="form-select">
+                                <option value="">— 루트 (depth 1) —</option>
+                            </select>
+                            <small class="form-hint">등록 후 변경 불가</small>
+                        </div>
+                        <div class="col-md-6" id="typeRow">
+                            <label class="form-label required">타입</label>
+                            <select name="menuType" class="form-select" required>
+                                <option value="GROUP">GROUP (자식 펼침)</option>
+                                <option value="LEAF" selected>LEAF (페이지 이동)</option>
+                            </select>
+                            <small class="form-hint">등록 후 변경 불가</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">메뉴명</label>
+                            <input type="text" name="menuName" class="form-control" required maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">아이콘 클래스</label>
+                            <input type="text" name="iconClass" class="form-control" maxlength="50" placeholder="ti ti-users">
+                            <small class="form-hint">Tabler 아이콘 (예: ti ti-users)</small>
+                        </div>
+                        <div class="col-md-9" id="urlRow">
+                            <label class="form-label required" id="urlLabel">URL</label>
+                            <input type="text" name="menuUrl" class="form-control" maxlength="200" placeholder="/admin/customers">
+                            <small class="form-hint">LEAF 만 입력. GROUP 은 자동으로 비움.</small>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">정렬</label>
+                            <input type="number" name="sortOrder" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="col-md-3" id="useYnRow">
+                            <label class="form-label">사용여부</label>
+                            <select name="useYn" class="form-select">
+                                <option value="Y" selected>사용</option>
+                                <option value="N">미사용</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="MenuForm.save()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/menu-list.js}"></script>
+<script th:src="@{/js/menu-form.js}"></script>
+</body>
+</html>

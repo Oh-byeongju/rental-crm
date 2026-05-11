@@ -96,3 +96,22 @@
 - [ ] BL_* 블록(4개 테이블) 동일 검토 절차 — ADR-003
 - [ ] 감사 컬럼 자동 주입 메커니즘 설계 — backend/guide/decisions/ 에 별도 ADR
 - [ ] 도메인 용어집 초기 골격 작성 (`docs/domain-terms/`)
+
+---
+
+## 5. 후속 보강
+
+### 5-1. ADR-008 (2026-05-11) — 권한 모델 전환
+
+본 ADR 에서 정의한 **`CM_ROLE_MENU` (메뉴 × R/W/D 매트릭스)** 는 [ADR-008](ADR-008-permission-model-auth-code.md) 에서 **폐기**됨.
+
+폐기 사유:
+- R/W/D 로 매핑이 모호한 액션 다수 (잠금해제·배치실행·엑셀다운로드 등)
+- 운영 단계 권한 추가 시 매번 코드 배포 부담
+
+대체 모델:
+- `CM_AUTH` (권한 키 마스터, 행 단위 `AUTH_CODE`)
+- `CM_ROLE_AUTH` (역할-권한 매핑)
+- 메뉴 진입은 "해당 메뉴의 `*_VIEW` 권한 보유" 로 판정
+
+자세한 근거·DDL·후속 작업은 [ADR-008](ADR-008-permission-model-auth-code.md) 참조.

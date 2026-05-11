@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('공통코드')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <!-- 페이지 헤더 -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">
+                            <a th:href="@{/admin/codes}"><i class="ti ti-arrow-left"></i> 그룹 목록</a>
+                        </div>
+                        <h2 class="page-title">
+                            <span th:text="${group.groupName}">청구상태</span>
+                            <small class="text-secondary" th:text="${group.groupCode}">BILLING_STATUS</small>
+                        </h2>
+                        <p class="text-secondary mt-1" th:text="${group.description}"></p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary" onclick="CodeForm.openCreate()">
+                                <i class="ti ti-plus"></i> 코드 등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 본문 -->
+        <div class="page-body">
+            <div class="container-xl">
+
+                <!-- 검색 카드 -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return CodeList.search(event)">
+                            <input type="hidden" id="groupCode" th:value="${group.groupCode}">
+                            <div class="col-md-3">
+                                <label class="form-label">코드 값</label>
+                                <input type="text" name="codeValue" class="form-control" placeholder="UNPAID">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">코드명</label>
+                                <input type="text" name="codeName" class="form-control" placeholder="미납">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">사용여부</label>
+                                <select name="useYn" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="Y" selected>사용</option>
+                                    <option value="N">미사용</option>
+                                </select>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="CodeList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 그리드 카드 -->
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="codeGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 코드 등록/수정 모달 ===== -->
+<div class="modal modal-blur fade" id="codeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="codeModalTitle">코드 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="codeForm">
+                    <input type="hidden" name="codeId">
+                    <input type="hidden" name="groupCode" th:value="${group.groupCode}">
+                    <div class="row g-2">
+                        <div class="col-md-6" id="codeValueRow">
+                            <label class="form-label required">코드 값</label>
+                            <input type="text" name="codeValue" class="form-control" required maxlength="50" placeholder="UNPAID">
+                            <small class="form-hint">그룹 내 중복 불가. 등록 후 변경 불가.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">코드명</label>
+                            <input type="text" name="codeName" class="form-control" required maxlength="100">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">정렬 순서</label>
+                            <input type="number" name="sortOrder" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">사용여부</label>
+                            <select name="useYn" class="form-select">
+                                <option value="Y" selected>사용</option>
+                                <option value="N">미사용</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="CodeForm.save()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/code-list.js}"></script>
+<script th:src="@{/js/code-form.js}"></script>
+</body>
+</html>
