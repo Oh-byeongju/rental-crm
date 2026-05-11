@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('권한 매트릭스')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">
+                            <a th:href="@{/admin/roles}"><i class="ti ti-arrow-left"></i> 역할 목록</a>
+                        </div>
+                        <h2 class="page-title">
+                            <span th:text="${role.roleName}">관리자</span>
+                            <small class="text-secondary" th:text="${role.roleCode}">ADMIN</small>
+                        </h2>
+                        <p class="text-secondary mt-1" th:text="${role.description}"></p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" id="btnSave" class="btn btn-primary" onclick="RoleAuthMatrix.save()">
+                                <i class="ti ti-device-floppy"></i> 저장
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <!-- SUPER_ADMIN 안내 (Thymeleaf 조건) -->
+                <div class="alert alert-info mb-3" th:if="${role.superAdmin}" role="alert">
+                    <div class="d-flex">
+                        <div><i class="ti ti-info-circle me-2"></i></div>
+                        <div>
+                            <strong>SUPER_ADMIN</strong> 역할은 모든 권한이 자동 부여됩니다. 매트릭스 변경은 비활성화되어 있습니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 클라이언트 필터 -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row g-2 search-form">
+                            <div class="col-md-3">
+                                <label class="form-label">메뉴</label>
+                                <input type="text" id="filterMenu" class="form-control" placeholder="고객" onkeyup="RoleAuthMatrix.applyFilter()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">권한 유형</label>
+                                <select id="filterType" class="form-select" onchange="RoleAuthMatrix.applyFilter()">
+                                    <option value="">전체</option>
+                                    <option value="VIEW">VIEW</option>
+                                    <option value="CREATE">CREATE</option>
+                                    <option value="UPDATE">UPDATE</option>
+                                    <option value="DELETE">DELETE</option>
+                                    <option value="EXECUTE">EXECUTE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">부여 상태</label>
+                                <select id="filterGranted" class="form-select" onchange="RoleAuthMatrix.applyFilter()">
+                                    <option value="">전체</option>
+                                    <option value="Y">부여</option>
+                                    <option value="N">미부여</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button type="button" class="btn btn-default" onclick="RoleAuthMatrix.toggleAll(true)">
+                                    <i class="ti ti-check"></i> 보이는 행 전체 부여
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="RoleAuthMatrix.toggleAll(false)">
+                                    <i class="ti ti-x"></i> 전체 해제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="matrixGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 페이지 데이터 -->
+<input type="hidden" id="roleId" th:value="${role.roleId}">
+<input type="hidden" id="roleSuperAdmin" th:value="${role.superAdmin}">
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/role-auth-matrix.js}"></script>
+</body>
+</html>
