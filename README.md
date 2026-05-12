@@ -97,6 +97,11 @@ rental-crm/
 │   ├── src/main/java/com/rental/crm/
 │   │   ├── common/{audit,config,response,exception,controller}
 │   │   ├── customer/{entity,repository,service,controller,dto}
+│   │   ├── code/{entity,repository,service,controller,dto}          # 공통코드 그룹/값
+│   │   ├── menu/{entity,repository,service,controller,dto}          # 2-depth 메뉴 트리
+│   │   ├── auth/{entity,repository,service,controller,dto}          # 역할/AUTH 매트릭스
+│   │   ├── admin/{entity,repository,service,controller,dto,security,seeder}
+│   │   │   # 관리자(CM_USER) + 권한 미세조정(CM_USER_AUTH) + PermissionService + X-User-Id 필터
 │   │   └── RentalCrmApplication.java
 │   ├── src/main/resources/
 │   │   ├── application.yml + application-{local,prod}.yml
@@ -159,7 +164,7 @@ reset.bat                  # YES 입력 필요
 - [x] Spring Boot 스켈레톤 + JPA Auditing (감사 9컬럼 자동 주입)
 - [x] 공통 응답 포맷 / 예외 처리 / Security 기본
 - [x] **고객 관리** (CRUD + AG Grid + 모달 + 사용여부 토글)
-- [ ] 관리자 계정 / 권한 / 메뉴 / 공통코드
+- [x] **공통코드 / 메뉴 / 권한 / 관리자** (ADR-008/009/010 권한 모델 + 사이드바 동적 렌더링)
 - [ ] 장비 / 상품 / 계약 / 기사 / 방문
 - [ ] 청구 / 월청구 배치 — **Ch.1 학습 핵심**
 - [ ] 수납 / 연체 / Kafka 이벤트 — **Ch.3 학습 핵심**
