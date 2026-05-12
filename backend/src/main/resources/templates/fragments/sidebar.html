@@ -12,107 +12,46 @@
                 rental-crm
             </a>
         </h1>
+
         <div class="collapse navbar-collapse" id="sidebar-menu">
             <ul class="navbar-nav pt-lg-3">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <span class="nav-link-icon"><i class="ti ti-home"></i></span>
-                        <span class="nav-link-title">대시보드</span>
+                <!-- 동적 메뉴 — SidebarMenuInterceptor 가 model.sidebarMenus 주입 (ADR-008) -->
+                <li th:each="menu : ${sidebarMenus}"
+                    th:class="${menu.menuType == 'GROUP'} ? 'nav-item dropdown' : 'nav-item'">
+
+                    <!-- LEAF (단독 또는 자식 없는 단독 LEAF) -->
+                    <a th:if="${menu.menuType == 'LEAF'}"
+                       class="nav-link"
+                       th:classappend="${menu.menuUrl == currentPath} ? ' active' : ''"
+                       th:href="${menu.menuUrl}">
+                        <span class="nav-link-icon" th:if="${menu.iconClass}">
+                            <i th:classappend="${menu.iconClass}"></i>
+                        </span>
+                        <span class="nav-link-title" th:text="${menu.menuName}">메뉴</span>
                     </a>
+
+                    <!-- GROUP — 자식 dropdown -->
+                    <th:block th:if="${menu.menuType == 'GROUP'}">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
+                            <span class="nav-link-icon" th:if="${menu.iconClass}">
+                                <i th:classappend="${menu.iconClass}"></i>
+                            </span>
+                            <span class="nav-link-title" th:text="${menu.menuName}">그룹</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a th:each="child : ${menu.children}"
+                               class="dropdown-item"
+                               th:classappend="${child.menuUrl == currentPath} ? ' active' : ''"
+                               th:href="${child.menuUrl}"
+                               th:text="${child.menuName}">하위</a>
+                        </div>
+                    </th:block>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
-                        <span class="nav-link-icon"><i class="ti ti-settings"></i></span>
-                        <span class="nav-link-title">공통관리</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/sys/codes">공통코드</a>
-                        <a class="dropdown-item" href="/sys/roles">권한</a>
-                        <a class="dropdown-item" href="/sys/menus">메뉴</a>
-                        <a class="dropdown-item" href="/sys/users">관리자 계정</a>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/customers">
-                        <span class="nav-link-icon"><i class="ti ti-users"></i></span>
-                        <span class="nav-link-title">고객 관리</span>
-                    </a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
-                        <span class="nav-link-icon"><i class="ti ti-box"></i></span>
-                        <span class="nav-link-title">장비 / 상품</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/equipments">장비 관리</a>
-                        <a class="dropdown-item" href="/products">상품 관리</a>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/contracts">
-                        <span class="nav-link-icon"><i class="ti ti-file-text"></i></span>
-                        <span class="nav-link-title">계약 관리</span>
-                    </a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
-                        <span class="nav-link-icon"><i class="ti ti-tool"></i></span>
-                        <span class="nav-link-title">기사 관리</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/engineers">기사 목록</a>
-                        <a class="dropdown-item" href="/visits">방문 이력</a>
-                    </div>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
-                        <span class="nav-link-icon"><i class="ti ti-receipt"></i></span>
-                        <span class="nav-link-title">청구 관리</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/billings">청구 목록</a>
-                        <a class="dropdown-item" href="/billings/batch">월 청구 생성 (배치)</a>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/payments">
-                        <span class="nav-link-icon"><i class="ti ti-credit-card"></i></span>
-                        <span class="nav-link-title">수납 관리</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/overdues">
-                        <span class="nav-link-icon"><i class="ti ti-alert-triangle"></i></span>
-                        <span class="nav-link-title">연체 관리</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/notifications">
-                        <span class="nav-link-icon"><i class="ti ti-bell"></i></span>
-                        <span class="nav-link-title">알림 내역</span>
-                    </a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button">
-                        <span class="nav-link-icon"><i class="ti ti-chart-bar"></i></span>
-                        <span class="nav-link-title">통계 / 리포트</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/reports/billing">청구 현황 엑셀</a>
-                        <a class="dropdown-item" href="/reports/overdue">미납 현황 엑셀</a>
-                        <a class="dropdown-item" href="/reports/payment/monthly">월별 수납 통계</a>
-                    </div>
+                <!-- 빈 사이드바 안내 -->
+                <li class="nav-item" th:if="${#lists.isEmpty(sidebarMenus)}">
+                    <span class="nav-link text-secondary">권한 보유 메뉴 없음</span>
                 </li>
 
             </ul>

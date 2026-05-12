@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * 실제 데이터는 CustomerRestController 의 JSON API 를 화면 JS 가 호출.
  */
 @Controller
-@RequestMapping("/customers")
+@RequestMapping("/admin/customers")
 public class CustomerPageController {
 
     @GetMapping
