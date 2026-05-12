@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('배치 실행 이력')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">청구/수납</div>
+                        <h2 class="page-title">배치 실행 이력</h2>
+                        <p class="text-secondary mt-1">Ch.1 학습 — 건별 INSERT vs JDBC bulk INSERT 의 DURATION_MS 차이를 비교.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return BatchLogList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">배치 유형</label>
+                                <select name="batchType" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="BILLING_CREATE">월 청구 생성</option>
+                                    <option value="OVERDUE_UPDATE">연체 갱신</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상태</label>
+                                <select name="batchStatus" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="RUNNING">실행 중</option>
+                                    <option value="COMPLETED">완료</option>
+                                    <option value="FAILED">실패</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="BatchLogList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="batchLogGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/batch-log-list.js}"></script>
+</body>
+</html>

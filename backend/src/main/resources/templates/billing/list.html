@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('청구 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">청구/수납</div>
+                        <h2 class="page-title">청구 관리</h2>
+                        <p class="text-secondary mt-1">행 더블클릭 = 상세. 월 청구 일괄 생성 배치는 Ch.1 학습 — 추후 트리거 버튼 추가.</p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary" disabled title="Ch.1 컨테이너 검증 후 활성">
+                                <i class="ti ti-player-play"></i> 월 청구 배치 실행 (TODO)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return BillingList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">청구번호</label>
+                                <input type="text" name="billingNo" class="form-control" placeholder="BILL-202605-000001">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">청구월</label>
+                                <input type="month" name="billingMonth" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상태</label>
+                                <select name="billingStatus" id="searchBillingStatus" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">고객</label>
+                                <select name="customerId" id="searchCustomerId" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="BillingList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="billingGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 상세 모달 (read-only + 액션 — 납기 변경 / 취소) -->
+<div class="modal modal-blur fade" id="billingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="billingModalTitle">청구 상세</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modalBillingId">
+                <input type="hidden" id="modalBillingStatus">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">청구번호</label>
+                        <div class="fw-bold" id="modalBillingNo">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">상태</label>
+                        <div id="modalStatus">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">계약번호</label>
+                        <div id="modalContractNo">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">고객</label>
+                        <div id="modalCustomer">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary">청구월</label>
+                        <div id="modalBillingMonth">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary">청구금액</label>
+                        <div id="modalAmount">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-secondary">발행일</label>
+                        <div id="modalIssueDate">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">납기일 (변경 가능)</label>
+                        <input type="date" id="modalDueDate" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">수납일시</label>
+                        <div id="modalPaidAt">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-warning" id="btnUpdateDue" onclick="BillingForm.updateDueDate()">납기 변경</button>
+                <button type="button" class="btn btn-danger"  id="btnCancel"    onclick="BillingForm.cancel()">청구 취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/billing-list.js}"></script>
+<script th:src="@{/js/billing-form.js}"></script>
+</body>
+</html>

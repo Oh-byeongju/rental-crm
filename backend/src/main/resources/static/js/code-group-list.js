@@ -13,6 +13,10 @@ const CodeGroupList = (() => {
           sortable: false, filter: false, resizable: false, pinned: 'left' },
         { headerName: '그룹 코드', field: 'groupCode',   minWidth: 180, flex: 1,
           cellRenderer: (p) => `<a href="/admin/codes/${p.value}" class="text-primary fw-bold">${p.value}</a>` },
+        { headerName: '구분',      field: 'systemYn',    minWidth: 90,  flex: 0,
+          cellRenderer: (p) => p.value === 'Y'
+              ? '<span class="badge bg-orange-lt">시스템</span>'
+              : '<span class="badge bg-blue-lt">일반</span>' },
         { headerName: '그룹명',    field: 'groupName',   minWidth: 140, flex: 1 },
         { headerName: '설명',      field: 'description', minWidth: 240, flex: 3 },
         { headerName: '사용여부',  field: 'useYn',       minWidth: 100, flex: 0,

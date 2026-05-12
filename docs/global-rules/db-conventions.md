@@ -84,6 +84,47 @@ GDI 의 `*_yn` 패턴 (`use_yn`, `del_yn`, `end_yn`) 은 모두 VARCHAR(1). 참�
 
 ---
 
+## 2-1. NUMBER 컬럼 — **NOT NULL + DEFAULT 0** 강제
+
+금액 / 개수 / 카운트 등 **NUMBER 컬럼은 NOT NULL DEFAULT 0** 으로 박는다.
+
+```sql
+-- ✅ 정답
+LOGIN_FAIL_CNT   NUMBER  DEFAULT 0  NOT NULL,
+DEPOSIT_AMOUNT   NUMBER  DEFAULT 0  NOT NULL,
+INSTALL_FEE      NUMBER  DEFAULT 0  NOT NULL,
+STOCK_QTY        NUMBER  DEFAULT 0  NOT NULL,
+
+-- ❌ 잘못 — null 누락 시 NOT NULL constraint 위반
+DEPOSIT_AMOUNT   NUMBER  NOT NULL,
+```
+
+### 근거
+
+INSERT 시 값 누락 → `ORA-01400: cannot insert NULL into ...` 사고 회피.
+JPA 빌더에서 필드 안 채워도 DB 디폴트로 자동 채워지므로 안전망 역할.
+
+### 예외 — `DEFAULT 0` 불필요
+
+| 예외 케이스 | 이유 |
+|---|---|
+| PK / FK (시퀀스 채번 / 외래키) | 0 이 의미 없음 — INSERT 시 반드시 값 지정 |
+| nullable 비즈니스 컬럼 (예: `BL_BATCH_LOG.DURATION_MS` — 배치 미완료 시) | 명시적 NULL 의미 보존 |
+| 통화/금액 컬럼 중 "기본 가격 0" 이 의미 없는 경우 | 비즈니스 결정에 따라 `NOT NULL` 만 명시 + Validation 으로 강제 |
+
+### JPA 매핑
+
+```java
+// ✅ DB DEFAULT 와 JPA NOT NULL 둘 다 박는다
+@Column(name = "STOCK_QTY", nullable = false)
+private Integer stockQty;
+```
+
+빌더에서 안 채우면 JPA hibernate 가 null 로 INSERT 시도 → DB DEFAULT 0 으로 자동 채워짐.
+Validation 측에서도 `@NotNull` 강제하여 API 입력단부터 차단 권장.
+
+---
+
 ## 3. 컬럼명 — 대문자 + 언더스코어
 
 ```

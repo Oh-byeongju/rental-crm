@@ -35,6 +35,7 @@
 |---|---|
 | [`README.md`](README.md) | 본 매핑 표 (이 파일) |
 | [`general/system-info.md`](general/system-info.md) | 빌드 명령·기술 스택·아키텍처·환경 프로파일 |
+| [`db/business-domain.md`](db/business-domain.md) | 업무 도메인 prefix → 의미 매핑 (테이블 / 시퀀스 / 패키지 설계 시 참조) |
 
 ---
 

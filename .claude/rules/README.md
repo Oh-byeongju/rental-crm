@@ -21,10 +21,12 @@
 ### `_meta/` — Claude 작업 메타룰
 
 코딩이든 정리든 리팩터든 **모든 작업에 적용**되는 메타 룰. 자동 로드.
+일부는 특정 작업 시점에만 적용 — `description` frontmatter 매칭으로 Read.
 
 - `communication.md` — 대화 원칙 (객관성 우선·Yes맨 방지) ✅ 자동 로드
 - `file-operations.md` — 파일·폴더 작업 시 영향 처리 ✅ 자동 로드
 - `rule-management.md` — 룰을 다루는 룰 (위치 결정·등록 동기화·충돌 우선순위) ✅ 자동 로드
+- `command-creation.md` — 새 슬래시 커맨드 + spec 자동화 체계 작성 시 ❌ 작업 시점 Read
 
 ### `frame/` — 짧고 항상 적용되는 코드 컨벤션
 
@@ -39,6 +41,7 @@
 
 - `project/README.md` — **프로젝트 매핑 표** (식별자·테이블 접두사·코드 도메인 등 — 이식 시 변경 포인트)
 - `project/general/system-info.md` — 빌드 명령·기술 스택·아키텍처·환경 프로파일
+- `project/db/business-domain.md` — 업무 도메인 prefix → 의미 매핑 (테이블 / 시퀀스 / 패키지 설계 시)
 
 ---
 

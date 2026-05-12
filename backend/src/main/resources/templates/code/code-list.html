@@ -24,7 +24,10 @@
                     </div>
                     <div class="col-auto ms-auto d-print-none">
                         <div class="btn-list">
-                            <button type="button" class="btn btn-primary" onclick="CodeForm.openCreate()">
+                            <button type="button" class="btn btn-primary"
+                                    th:disabled="${group.systemYn == 'Y'}"
+                                    th:title="${group.systemYn == 'Y'} ? '시스템 코드 그룹은 코드 추가/변경 불가' : ''"
+                                    onclick="CodeForm.openCreate()">
                                 <i class="ti ti-plus"></i> 코드 등록
                             </button>
                         </div>
@@ -114,6 +117,22 @@
                                 <option value="Y" selected>사용</option>
                                 <option value="N">미사용</option>
                             </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">코드 설명</label>
+                            <input type="text" name="description" class="form-control" maxlength="200" placeholder="모호한 코드값 부연 (선택)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">속성 1</label>
+                            <input type="text" name="propVal1" class="form-control" maxlength="100" placeholder="도메인 자유 사용">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">속성 2</label>
+                            <input type="text" name="propVal2" class="form-control" maxlength="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">속성 3</label>
+                            <input type="text" name="propVal3" class="form-control" maxlength="100">
                         </div>
                     </div>
                 </form>

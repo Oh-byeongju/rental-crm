@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('계약 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">계약관리</div>
+                        <h2 class="page-title">계약 관리</h2>
+                        <p class="text-secondary mt-1">계약번호 클릭 = 상세. 상태 전이 (일시정지/재개/해지) 는 상세 페이지에서.</p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary" onclick="ContractForm.openCreate()">
+                                <i class="ti ti-plus"></i> 계약 등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return ContractList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">계약번호</label>
+                                <input type="text" name="contractNo" class="form-control" placeholder="CT-20260512-00001">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">고객</label>
+                                <select name="customerId" id="searchCustomerId" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상품</label>
+                                <select name="productId" id="searchProductId" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상태</label>
+                                <select name="contractStatus" id="searchStatus" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="ContractList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="contractGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 등록 모달 (신규 계약만 — 수정/상태 전이는 상세 페이지) -->
+<div class="modal modal-blur fade" id="contractModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">계약 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="contractForm">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label required">고객</label>
+                            <select name="customerId" id="formCustomerId" class="form-select" required>
+                                <option value="">— 선택 —</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">상품</label>
+                            <select name="productId" id="formProductId" class="form-select" required>
+                                <option value="">— 선택 —</option>
+                            </select>
+                            <small class="form-hint">단종 장비 또는 재고 부족 시 등록 시점 차단</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">시작일</label>
+                            <input type="date" name="startDate" class="form-control" required>
+                            <small class="form-hint">종료일은 상품의 기본 계약 개월로 자동 계산</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">월 렌탈료 (자동 스냅샷)</label>
+                            <input type="text" id="previewMonthlyFee" class="form-control" readonly placeholder="상품 선택 시 표시">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label required">설치 주소</label>
+                            <input type="text" name="installAddress" class="form-control" required maxlength="500">
+                            <small class="form-hint">고객 선택 시 고객 주소 자동 입력 (수정 가능)</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="ContractForm.save()">계약 등록</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/contract-list.js}"></script>
+<script th:src="@{/js/contract-form.js}"></script>
+</body>
+</html>

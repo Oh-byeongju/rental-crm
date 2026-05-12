@@ -10,6 +10,9 @@
 | 룰 | description | 파일 |
 |---|---|---|
 | 백오피스 화면 구현 규칙 | 백오피스 화면(Thymeleaf + Tabler + AG Grid) 작성 시 — 그리드 컬럼 자동 확장 / 검색 폼 잘림 방지 / 모달 패턴 | [conventions/backoffice-ui-rules.md](conventions/backoffice-ui-rules.md) |
+| API 인터페이스 안전 규칙 | Controller / Service 작성 시 — 서버측 검증 (IDOR, 한도, 상태 재조회, UNIQUE 사전 검증) | [conventions/api-safety.md](conventions/api-safety.md) |
+| 삭제 방어 | DELETE / 비활성화 API 작성 시 — allow-list 기반 L1+L2 방어 | [conventions/delete-defense.md](conventions/delete-defense.md) |
+| Service 응답 매핑 패턴 | Service.search() 가 페이지 응답 매핑 시 — N+1 회피 (페이지 단위 일괄 fetch + Map 변환) | [conventions/service-mapping-pattern.md](conventions/service-mapping-pattern.md) |
 | 감사 컬럼 자동 주입 | JPA 엔티티 작성 시 — 9컬럼 자동 주입 메커니즘 | [decisions/ADR-005](decisions/ADR-005-audit-columns-auto-injection.md) |
 | Spring Boot 버전 | Spring Boot 신규 의존성 검토 시 — 3.5.0 채택 근거 | [decisions/ADR-006](decisions/ADR-006-spring-boot-version.md) |
 

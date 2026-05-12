@@ -69,6 +69,7 @@ public class CodeService {
     @Transactional
     public CodeGroupResponse updateGroup(String groupCode, CodeGroupUpdateRequest req) {
         var group = loadGroup(groupCode);
+        validateNotSystem(group);
         group.changeName(req.groupName());
         group.changeDescription(req.description());
         group.changeUseYn(req.useYn());
@@ -79,6 +80,7 @@ public class CodeService {
     @Transactional
     public void deleteGroup(String groupCode) {
         var group = loadGroup(groupCode);
+        validateNotSystem(group);
         long codeCount = codeRepository.countByGroupCode(groupCode);
         if (codeCount > 0) {
             throw new BusinessException(ErrorCode.CONFLICT,
@@ -90,9 +92,8 @@ public class CodeService {
     // ===================== 코드값 — Create =====================
     @Transactional
     public CodeResponse registerCode(CodeCreateRequest req) {
-        if (!groupRepository.existsById(req.groupCode())) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "그룹 코드 없음: " + req.groupCode());
-        }
+        var group = loadGroup(req.groupCode());
+        validateNotSystem(group);
         if (codeRepository.existsByGroupCodeAndCodeValue(req.groupCode(), req.codeValue())) {
             throw new BusinessException(ErrorCode.ALREADY_EXISTS,
                     "이미 존재하는 코드값: " + req.groupCode() + "/" + req.codeValue());
@@ -102,6 +103,10 @@ public class CodeService {
                 .codeValue(req.codeValue())
                 .codeName(req.codeName())
                 .sortOrder(req.sortOrder())
+                .description(req.description())
+                .propVal1(req.propVal1())
+                .propVal2(req.propVal2())
+                .propVal3(req.propVal3())
                 .build();
         return CodeResponse.from(codeRepository.save(code));
     }
@@ -139,8 +144,13 @@ public class CodeService {
     @Transactional
     public CodeResponse updateCode(Long codeId, CodeUpdateRequest req) {
         var code = loadCode(codeId);
+        validateNotSystem(loadGroup(code.getGroupCode()));
         code.changeName(req.codeName());
         code.changeSortOrder(req.sortOrder());
+        code.changeDescription(req.description());
+        code.changePropVal1(req.propVal1());
+        code.changePropVal2(req.propVal2());
+        code.changePropVal3(req.propVal3());
         code.changeUseYn(req.useYn());
         return CodeResponse.from(code);
     }
@@ -149,10 +159,20 @@ public class CodeService {
     @Transactional
     public void deactivateCode(Long codeId) {
         var code = loadCode(codeId);
+        validateNotSystem(loadGroup(code.getGroupCode()));
         code.deactivate();
     }
 
     // ===================== Private =====================
+
+    /** 시스템 코드 그룹 변경 차단 — backend/guide/conventions/delete-defense.md allow-list 패턴. */
+    private void validateNotSystem(CodeGroup group) {
+        if (group.isSystem()) {
+            throw new BusinessException(ErrorCode.BUSINESS_RULE,
+                    "시스템 코드 그룹은 변경/삭제할 수 없습니다: " + group.getGroupCode());
+        }
+    }
+
     private CodeGroup loadGroup(String groupCode) {
         return groupRepository.findById(groupCode)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND,

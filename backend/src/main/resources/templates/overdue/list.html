@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('연체 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">청구/수납</div>
+                        <h2 class="page-title">연체 관리</h2>
+                        <p class="text-secondary mt-1">미해결 연체 우선 표시 (연체일수 desc). 수동 해제는 행 더블클릭.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return OverdueList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">고객</label>
+                                <select name="customerId" id="searchCustomerId" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">해결 여부</label>
+                                <select name="resolvedOnly" class="form-select">
+                                    <option value="N" selected>미해결</option>
+                                    <option value="">전체</option>
+                                    <option value="Y">해결됨</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">최소 연체일수</label>
+                                <input type="number" name="minDays" class="form-control" min="0" placeholder="30">
+                            </div>
+                            <div class="col-md-3 d-flex justify-content-end align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="OverdueList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="overdueGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 해제 모달 -->
+<div class="modal modal-blur fade" id="resolveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">연체 수동 해제</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resolveForm">
+                    <input type="hidden" name="overdueId">
+                    <div class="mb-2 text-secondary">
+                        <span id="resolveTarget"></span> 의 연체를 해제합니다.
+                    </div>
+                    <label class="form-label required">해제 사유</label>
+                    <textarea name="reason" class="form-control" rows="3" required maxlength="1000"
+                              placeholder="예: 분할 합의 / 자체 결제 확인 / 행정 조치"></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="OverdueForm.submitResolve()">해제</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/overdue-list.js}"></script>
+<script th:src="@{/js/overdue-form.js}"></script>
+</body>
+</html>

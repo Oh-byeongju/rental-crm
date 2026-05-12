@@ -21,20 +21,20 @@
 
 > ref-project 의 `/cache-refresh` 흐름 그대로 옮김. 도메인 작업 시 즉시 가치 발생.
 
-- [ ] **DB 스키마 캐시** (`docs/cache/{table,column,index}.txt`) — Oracle 메타테이블 (`USER_TAB_COMMENTS` / `USER_TAB_COLUMNS` / `USER_INDEXES`) 에서 자동 생성
-- [ ] **캐시 갱신 스크립트** `infra/cache/refresh.py` — `docker exec rental-oracle sqlplus` 호출 + 텍스트 파싱
-- [ ] **`/cache-refresh` 슬래시 커맨드**:
+- [x] **DB 스키마 캐시** (`docs/cache/{table,column,index}.txt`) — Oracle 메타테이블 (`USER_TAB_COMMENTS` / `USER_TAB_COLUMNS` / `USER_INDEXES`) 에서 자동 생성
+- [x] **캐시 갱신 스크립트** `infra/cache/refresh.py` — `docker exec rental-oracle sqlplus` 호출 + 텍스트 파싱
+- [x] **`/cache-refresh` 슬래시 커맨드**:
   - `.claude/commands/cache-refresh.md` (얇은 진입점)
   - `docs/commands/cache-refresh-spec.md` (두꺼운 spec)
-- [ ] 캐시를 사용하는 룰 신설 — `docs/global-rules/db-cache-pattern.md` (description: "DB 스키마 조회 시 캐시 우선")
+- [x] 캐시를 사용하는 룰 신설 — `docs/global-rules/db-cache-pattern.md` (description: "DB 스키마 조회 시 캐시 우선")
 
 ### 2-2. 잔여 도메인 (단순 CRUD 묶음 — Phase 1)
 
-- [ ] 장비 (`CT_EQUIPMENT`) — 단순 CRUD + EQUIPMENT_TYPE 코드 selectbox
-- [ ] 상품 (`CT_PRODUCT`) — 장비 FK + 금액 컬럼
-- [ ] 계약 (`CT_CONTRACT`) — 일시정지/해지 `EXECUTE` 권한 + 상태 전이
-- [ ] 기사 (`CT_ENGINEER`) — 지역별 가용 기사 조회 (`IDX_CT_ENGINEER_AREA`)
-- [ ] 방문 이력 (`CT_VISIT`) — 방문 배정/완료 + 기사별 일정 5건 초과 검증 (04 §5-1)
+- [x] 장비 (`CT_EQUIPMENT`) — 단순 CRUD + EQUIPMENT_TYPE selectbox **+ 재고 모델 STOCK_QTY (동적 계산)**
+- [x] 상품 (`CT_PRODUCT`) — 장비 FK + 4 NUMBER 검증 (Positive/Min)
+- [x] 계약 (`CT_CONTRACT`) — 자동 채번 + 재고 3중 검증 + 상태 전이 4종 + **별도 상세 페이지**
+- [x] 기사 (`CT_ENGINEER`) — 단순 CRUD + INTERNAL/EXTERNAL + 지역 검색
+- [x] 방문 이력 (`CT_VISIT`) — 기사별 일정 5건 초과 차단 + complete/cancel 상태 전이
 
 ### 2-3. 학습 핵심 3챕터
 
@@ -74,6 +74,7 @@
 - [ ] **Oracle Cloud Free Tier 배포** — Railway/Render 는 Oracle 미지원
 - [ ] **CI/CD GitHub Actions** — 빌드/테스트 자동화
 - [ ] **백오피스 v 포털 보안 분리** — SecurityConfig 의 TODO
+- [ ] **배치 모듈 분리** — `rental-crm-batch` 별도 Spring Boot 앱. 백오피스가 트리거 API 호출 → 배치 앱이 실제 실행. Kafka 토픽 통신 정합 (배치 결과 → Kafka → 알림 INSERT). 학습 단계는 단일 앱 유지, 운영 이행 시점 ADR 작성 후 분리 (2026-05-12 결정 — 사용자 인사이트: "백오피스에서 호출은 하지만 실행은 타프로젝트, Kafka 와도 정합")
 
 ### 정책 검토
 
@@ -87,3 +88,8 @@
 - ref-project 자동화 시스템 분석 후 **점진적 도입** 결정 (2026-05-12). 풀세트 (1+2+3차) 대신 1차 → 패턴 정형화 → 3차 순서.
 - 본 TODO 신설 자체가 1차 도입의 일부 (TODO + retro/ + claude-tuning/ 폴더).
 - 2차 도구 (DB 캐시 + `/cache-refresh`) 가 가치 가장 큼 — 다음 도메인 작업 시 즉시 활용.
+- **2026-05-12 2회차 — NEXT 2-2 5개 도메인 + 코드 구조 강화 (S1+S2) 완수.** 약 90+ 파일 변경.
+  - ref-project 룰 4개 도입 (`command-creation` / `business-domain` / `api-safety` / `delete-defense`) — 실전 적용 (계약·방문 상태 전이 / 코드 시스템 그룹 차단)
+  - `db-conventions §2-1` NUMBER NOT NULL DEFAULT 0 룰 신설
+  - 코드 구조 강화: `CM_CODE_GROUP.SYSTEM_YN` + `CM_CODE.DESCRIPTION/PROP_VAL1~3` (ref-project sy_code_dtl 구조 차용)
+  - **DDL/캐시 검증 미수행** (Docker 미가동) — 일과 끝 컨테이너 재생성 후 검증. 가정 시그니처 (CustomerRepository 등) 컴파일 오류 가능성.

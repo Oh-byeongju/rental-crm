@@ -71,6 +71,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 빌드·기술스택·아키텍처·환경·보안 등 매 세션 알아둘 컨텍스트.
 
 - 시스템 정보: @.claude/rules/project/general/system-info.md
+- DB 도메인 prefix 매핑: @.claude/rules/project/db/business-domain.md
 
 ## 룰 진입점 (3-tier 구조)
 

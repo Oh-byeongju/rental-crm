@@ -34,6 +34,10 @@ const CodeGroupForm = (() => {
         try {
             const res = await App.get(`/api/code-groups/${groupCode}`);
             const g = res.data;
+            if (g.systemYn === 'Y') {
+                App.toast('시스템 코드 그룹은 변경할 수 없습니다', 'warning');
+                return;
+            }
             document.querySelector('#codeGroupModalTitle').textContent = `그룹 수정 — ${g.groupCode}`;
             const form = document.querySelector('#codeGroupForm');
             form.reset();

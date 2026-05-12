@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('계약 상세')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">
+                            <a th:href="@{/admin/contracts}"><i class="ti ti-arrow-left"></i> 계약 목록</a>
+                        </div>
+                        <h2 class="page-title">
+                            <span th:text="${contract.contractNo}">CT-20260512-00001</span>
+                            <span class="ms-2 badge"
+                                  th:classappend="${contract.contractStatus == 'ACTIVE'} ? 'bg-green-lt'
+                                                  : (${contract.contractStatus == 'SUSPENDED'} ? 'bg-orange-lt' : 'bg-red-lt')"
+                                  th:text="${contract.contractStatus}">ACTIVE</span>
+                        </h2>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <input type="hidden" id="contractId" th:value="${contract.contractId}">
+                        <input type="hidden" id="contractStatus" th:value="${contract.contractStatus}">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary"
+                                    th:disabled="${contract.contractStatus == 'TERMINATED'}"
+                                    onclick="ContractDetail.openEdit()">
+                                <i class="ti ti-edit"></i> 수정
+                            </button>
+                            <button type="button" class="btn btn-warning"
+                                    th:disabled="${contract.contractStatus != 'ACTIVE'}"
+                                    onclick="ContractDetail.suspend()">
+                                <i class="ti ti-player-pause"></i> 일시정지
+                            </button>
+                            <button type="button" class="btn btn-success"
+                                    th:disabled="${contract.contractStatus != 'SUSPENDED'}"
+                                    onclick="ContractDetail.resume()">
+                                <i class="ti ti-player-play"></i> 재개
+                            </button>
+                            <button type="button" class="btn btn-danger"
+                                    th:disabled="${contract.contractStatus == 'TERMINATED'}"
+                                    onclick="ContractDetail.terminate()">
+                                <i class="ti ti-x"></i> 해지
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <!-- 계약 정보 -->
+                <div class="card mb-3">
+                    <div class="card-header"><h3 class="card-title">계약 정보</h3></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">계약번호</label>
+                                <div class="fw-bold" th:text="${contract.contractNo}">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">상태</label>
+                                <div th:text="${contract.contractStatus}">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">고객</label>
+                                <div>
+                                    <span th:text="${contract.customerName}">홍길동</span>
+                                    <small class="text-secondary" th:text="'(' + ${contract.customerNo} + ')'"></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">상품 / 장비</label>
+                                <div>
+                                    <span th:text="${contract.productName}">상품명</span>
+                                    <small class="text-secondary"
+                                           th:text="'(' + ${contract.equipmentModelName} + ' / ' + ${contract.equipmentCode} + ')'"></small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">월 렌탈료 (스냅샷)</label>
+                                <div th:text="${#numbers.formatInteger(contract.monthlyFee, 3, 'COMMA')} + ' 원'">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">시작일</label>
+                                <div th:text="${contract.startDate}">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">종료일</label>
+                                <div th:text="${contract.endDate}">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">등록일시</label>
+                                <div th:text="${#temporals.format(contract.createdAt, 'yyyy-MM-dd HH:mm')}">-</div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label text-secondary">설치 주소</label>
+                                <div th:text="${contract.installAddress}">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상태 이력 -->
+                <div class="card mb-3" th:if="${contract.suspendedAt != null || contract.terminatedAt != null}">
+                    <div class="card-header"><h3 class="card-title">상태 이력</h3></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12" th:if="${contract.suspendedAt != null}">
+                                <label class="form-label text-secondary">일시정지</label>
+                                <div>
+                                    <span th:text="${#temporals.format(contract.suspendedAt, 'yyyy-MM-dd HH:mm')}">-</span>
+                                    <span class="text-secondary ms-2" th:text="'— ' + ${contract.suspendReason}"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12" th:if="${contract.resumedAt != null}">
+                                <label class="form-label text-secondary">재개</label>
+                                <div th:text="${#temporals.format(contract.resumedAt, 'yyyy-MM-dd HH:mm')}">-</div>
+                            </div>
+                            <div class="col-md-12" th:if="${contract.terminatedAt != null}">
+                                <label class="form-label text-secondary">해지</label>
+                                <div>
+                                    <span th:text="${#temporals.format(contract.terminatedAt, 'yyyy-MM-dd HH:mm')}">-</span>
+                                    <span class="text-secondary ms-2" th:text="'— ' + ${contract.terminateReason}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 수정 모달 (END_DATE / INSTALL_ADDRESS) -->
+<div class="modal modal-blur fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">계약 수정 (종료일 / 설치 주소)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label required">종료일</label>
+                            <input type="date" name="endDate" class="form-control" required th:value="${contract.endDate}">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label required">설치 주소</label>
+                            <input type="text" name="installAddress" class="form-control" required maxlength="500" th:value="${contract.installAddress}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="ContractDetail.save()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 사유 모달 (suspend / terminate 공용) -->
+<div class="modal modal-blur fade" id="reasonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reasonModalTitle">사유 입력</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reasonForm">
+                    <label class="form-label required">사유</label>
+                    <textarea name="reason" class="form-control" rows="3" required maxlength="1000"></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="ContractDetail.submitReason()">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/contract-detail.js}"></script>
+</body>
+</html>
