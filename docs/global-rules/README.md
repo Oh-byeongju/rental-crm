@@ -19,6 +19,7 @@
 | 룰 | description | 파일 |
 |---|---|---|
 | DB 컨벤션 | 신규 테이블 / 컬럼 / 시퀀스 / 인덱스 설계 시 — DB 메타 룰 (타입·명명·기본값). `*_YN` VARCHAR(1) | [db-conventions.md](db-conventions.md) |
+| DB 캐시 사용 패턴 | DB 스키마 / 시드 조회 시 — `docs/cache/` 텍스트 캐시 우선 (DB 직접 조회 금지) | [db-cache-pattern.md](db-cache-pattern.md) |
 | 프론트엔드 그리드 라이브러리 | 신규 화면에 그리드(데이터 테이블) 사용 시 — 채택 가능 라이브러리 + 라이선스 제약 (Webix 금지) | [frontend-grid-library.md](frontend-grid-library.md) |
 
 ---
