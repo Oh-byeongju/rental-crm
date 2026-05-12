@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('관리자 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">시스템관리</div>
+                        <h2 class="page-title">관리자 관리</h2>
+                        <p class="text-secondary mt-1">행 더블클릭 = 수정. EMAIL 클릭 = 권한 미세 조정.</p>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-primary" onclick="AdminUserForm.openCreate()">
+                                <i class="ti ti-plus"></i> 관리자 등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return AdminUserList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">이메일</label>
+                                <input type="text" name="email" class="form-control" placeholder="manager@rental.crm">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">이름</label>
+                                <input type="text" name="userName" class="form-control" placeholder="홍길동">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">사용여부</label>
+                                <select name="useYn" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="Y" selected>사용</option>
+                                    <option value="N">미사용</option>
+                                </select>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="AdminUserList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="userGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 등록/수정 모달 -->
+<div class="modal modal-blur fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalTitle">관리자 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" name="userId">
+                    <div class="row g-2">
+                        <div class="col-md-6" id="emailRow">
+                            <label class="form-label required">이메일 (로그인 ID)</label>
+                            <input type="email" name="email" class="form-control" required maxlength="254">
+                        </div>
+                        <div class="col-md-6" id="passwordRow">
+                            <label class="form-label required">비밀번호</label>
+                            <input type="password" name="password" class="form-control" minlength="8" maxlength="64">
+                            <small class="form-hint">8자 이상, 영문+숫자+특수문자</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">이름</label>
+                            <input type="text" name="userName" class="form-control" required maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">연락처</label>
+                            <input type="tel" name="phone" class="form-control" maxlength="20" placeholder="01012345678">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">역할</label>
+                            <select name="roleId" id="roleSelect" class="form-select">
+                                <option value="">— 미부여 —</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" id="useYnRow">
+                            <label class="form-label">사용여부</label>
+                            <select name="useYn" class="form-select">
+                                <option value="Y" selected>사용</option>
+                                <option value="N">미사용</option>
+                            </select>
+                        </div>
+                        <!-- 수정 모드 전용 액션 -->
+                        <div class="col-12 d-none" id="adminActionsRow">
+                            <hr class="my-3">
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="text-secondary me-2">관리자 액션</span>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="AdminUserForm.unlock()">
+                                    <i class="ti ti-lock-open"></i> 잠금 해제
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="AdminUserForm.openPasswordReset()">
+                                    <i class="ti ti-key"></i> 비밀번호 재설정
+                                </button>
+                                <span class="ms-auto" id="lockStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="AdminUserForm.save()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 비밀번호 재설정 모달 -->
+<div class="modal modal-blur fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">비밀번호 재설정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm">
+                    <input type="hidden" name="userId">
+                    <div class="mb-2 text-secondary"><span id="passwordTargetEmail"></span> 의 비밀번호를 새로 설정합니다.</div>
+                    <label class="form-label required">새 비밀번호</label>
+                    <input type="password" name="newPassword" class="form-control" minlength="8" maxlength="64" required>
+                    <small class="form-hint">8자 이상, 영문+숫자+특수문자. 잠금도 함께 해제됩니다.</small>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="AdminUserForm.savePasswordReset()">재설정</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/user-list.js}"></script>
+<script th:src="@{/js/user-form.js}"></script>
+</body>
+</html>

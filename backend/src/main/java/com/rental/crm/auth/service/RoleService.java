@@ -1,5 +1,6 @@
 package com.rental.crm.auth.service;
 
+import com.rental.crm.admin.service.PermissionCacheService;
 import com.rental.crm.auth.dto.RoleAuthUpdateRequest;
 import com.rental.crm.auth.dto.RoleCreateRequest;
 import com.rental.crm.auth.dto.RoleResponse;
@@ -37,6 +38,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleAuthRepository roleAuthRepository;
     private final AuthRepository authRepository;
+    private final PermissionCacheService permissionCacheService;
 
     // ===================== Role — Create =====================
     @Transactional
@@ -94,7 +96,9 @@ public class RoleService {
             // 매핑 함께 삭제
             roleAuthRepository.deleteByRoleId(roleId);
         }
-        // TODO 5단계 후속: 해당 역할 보유 사용자 존재 시 CONFLICT (관리자 도메인 완성 후 추가)
+        // ADR-010 §2-2 — 사용자 캐시 무효화 (역할 사용 사용자가 있을 시점)
+        permissionCacheService.invalidateByRole(roleId);
+        // TODO 후속: 해당 역할 보유 사용자 존재 시 CONFLICT (정책 결정 후)
         roleRepository.delete(role);
     }
 
@@ -139,7 +143,8 @@ public class RoleService {
                 .toList();
         roleAuthRepository.saveAll(toSave);
 
-        // TODO ADR-010: PermissionCacheService.invalidateRole(roleId) — 6단계에서 도입
+        // ADR-010 §2-2 — 역할 권한 변경 시 해당 역할 보유 모든 사용자 캐시 무효화
+        permissionCacheService.invalidateByRole(roleId);
     }
 
     // ===================== Private =====================
