@@ -68,7 +68,13 @@ def run_sql(sql_file: str, output_file: str, verbose: bool = False):
             timeout=60, encoding="utf-8", errors="replace",
         )
         if result.returncode != 0:
-            return False, f"sqlplus 오류: {result.stderr.strip()[:200]}"
+            err = result.stderr.strip()
+            if not err:
+                # sqlplus 는 ORA-/ERROR 를 stdout 으로 내보낼 때가 많음 → 끝부분에서 추출
+                ora_lines = [ln.strip() for ln in result.stdout.splitlines()
+                             if "ORA-" in ln or "ERROR at line" in ln]
+                err = " / ".join(ora_lines[-3:]) if ora_lines else "(stderr/ORA-* 모두 없음)"
+            return False, f"sqlplus 오류: {err[:200]}"
 
         # sqlplus 출력에 ERROR 가 섞여있을 수 있음 — 검증
         if "ORA-" in result.stdout:

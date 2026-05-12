@@ -49,7 +49,7 @@ Spring Initializr 디폴트 버전이 **4.0.6** 으로 잡힘.
 - 본 프로젝트는 **Java 21 LTS** 채택. Spring Boot 3.5.0 호환 (3.x 는 Java 17~21 지원).
 - 시스템 `JAVA_HOME` 은 **17 그대로 유지** (다른 프로젝트 호환성 보호).
 - 본 프로젝트만 21 사용 — `backend/gradle.properties` 의
-  `org.gradle.java.installations.paths` 가 `C:\WORK\JDK\openjdk-21+35_windows-x64_bin` 지정.
+  `org.gradle.java.installations.paths` 가 `D:\Dev\JDK\openjdk-21+35_windows-x64_bin` 지정.
 
 ### 근거
 - Java 21 LTS 출시 (2023-09-19), 안정성 검증됨

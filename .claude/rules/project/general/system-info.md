@@ -69,7 +69,7 @@ cd backend
 .\gradlew build && java -jar build/libs/*.jar
 ```
 
-> Java 21 경로 (사용자별 — 노트북 이주 시 갱신): `C:\WORK\JDK\openjdk-21+35_windows-x64_bin`
+> Java 21 경로 (사용자별 — 노트북 이주 시 갱신): `D:\Dev\JDK\openjdk-21+35_windows-x64_bin`
 > 시스템 JAVA_HOME 은 17 유지. `backend/gradle.properties` 의
 > `org.gradle.java.installations.paths` 가 21 경로를 가리킴.
 > IntelliJ 도 동일 경로를 Gradle JDK 로 설정.
