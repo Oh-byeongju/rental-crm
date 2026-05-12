@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('알림 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">공통</div>
+                        <h2 class="page-title">알림 관리</h2>
+                        <p class="text-secondary mt-1">본인 + broadcast 알림. 행 더블클릭 = 읽음 처리.</p>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-default" onclick="NotificationList.markAllRead()">
+                            <i class="ti ti-checks me-1"></i> 전체 읽음
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return NotificationList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">읽음 여부</label>
+                                <select name="readYn" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="N" selected>미읽음</option>
+                                    <option value="Y">읽음</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">알림 종류</label>
+                                <select name="notificationType" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="BILLING_CREATED">청구 생성</option>
+                                    <option value="PAYMENT_COMPLETED">결제 완료</option>
+                                    <option value="PAYMENT_OVERDUE">연체 발생</option>
+                                    <option value="VISIT_ASSIGNED">방문 배정</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="NotificationList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="notificationGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/notification-list.js}"></script>
+</body>
+</html>
