@@ -7,11 +7,27 @@
 
 ---
 
-## 1. NOW — 현재 사이클
+## 1. NOW — 현재 사이클 (4회차 — 배치 모듈 분리)
 
-> 지금 손대고 있거나 즉시 시작할 작업.
+> 2026-05-13 시작. ADR-014 채택 — `rental-batch` 별도 Spring Boot 앱 + `domain` 공유 모듈 + Gradle 멀티 모듈.
+> 2026-05-12 LATER §"배치 모듈 분리" 결정 폐기 (학습 단계와 최종 구조 동일하게).
 
-(현재 NOW 비어 있음 — 다음 작업 NEXT 에서 끌어올림.)
+### 1-1. 배치 분리 인프라 (Step 0~5)
+
+- [x] **Step 0** — ADR-014 작성 + TODO/99 정합 갱신
+- [x] **Step 1** — 디렉토리 리네이밍 + 신규 모듈 골격 (`backend/` → `backoffice/`, `batch/` `domain/` 신규)
+- [x] **Step 2** — Gradle 멀티 모듈 빌드 (root `settings.gradle` + 모듈별 `build.gradle` × 3)
+- [x] **Step 3** — `domain` 모듈 추출 (Entity 19 + Repository 19 + BaseAuditEntity + AuditContext + ApiResponse/PageResponse + BusinessException/ErrorCode)
+- [x] **Step 4** — batch 앱 스켈레톤 (`BatchApplication` + 포트 9093 + `application.yml`)
+- [ ] **Step 5** — backoffice → batch REST 트리거 (비동기 fire-and-forget + DB `BL_BATCH_LOG` 폴링) ← **다음 세션 시작 지점**
+
+### 1-2. 배치 학습 본체 (Step 6~10)
+
+- [ ] **Step 6** — 배치 시나리오 정의 (`docs/100. 배치 시나리오 정의.md` — 도메인별 메뉴 분류)
+- [ ] **Step 7** — **Ch.1 청구 배치 6 라운드 측정** (본 학습 본체 — bulk INSERT / chunk commit / UNDO / 메모리 / 재시작)
+- [ ] **Step 8** — UNDO 폭주 재현 환경 (Docker oracle 작은 UNDO tablespace 강제)
+- [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습)
+- [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계)
 
 ---
 
@@ -36,11 +52,9 @@
 - [x] 기사 (`CT_ENGINEER`) — 단순 CRUD + INTERNAL/EXTERNAL + 지역 검색
 - [x] 방문 이력 (`CT_VISIT`) — 기사별 일정 5건 초과 차단 + complete/cancel 상태 전이
 
-### 2-3. 학습 핵심 3챕터
+### 2-3. 학습 핵심 — Ch.2 (Ch.1/Ch.3 은 NOW Step 7/9 로 이동)
 
-- [ ] **Ch.1 청구** — 월 청구 일괄 생성 배치 + 건별 INSERT vs bulk INSERT 성능 측정 → `BL_BATCH_LOG.DURATION_MS` 기록 → README `📈 성능 측정 결과` 채우기
-- [ ] **Ch.2 통계 미납 엑셀** — 쿼리 튜닝 (서브쿼리 → JOIN + 인덱스 활용) + Oracle EXPLAIN PLAN 전/후 비교 + Apache POI SXSSF 스트리밍
-- [ ] **Ch.3 수납 + 연체 Kafka** — Producer/Consumer 양방향 토픽 + 멱등성 (Idempotent Consumer + offset commit 정책) + `CM_NOTIFICATION` INSERT
+- [ ] **Ch.2 통계 미납 엑셀** — 쿼리 튜닝 (서브쿼리 → JOIN + 인덱스 활용) + Oracle EXPLAIN PLAN 전/후 비교 + Apache POI SXSSF 스트리밍. 배치 모듈 학습 본체 (NOW Step 7~9) 후 진행.
 
 ### 2-4. 대시보드 + 알림
 
@@ -74,7 +88,8 @@
 - [ ] **Oracle Cloud Free Tier 배포** — Railway/Render 는 Oracle 미지원
 - [ ] **CI/CD GitHub Actions** — 빌드/테스트 자동화
 - [ ] **백오피스 v 포털 보안 분리** — SecurityConfig 의 TODO
-- [ ] **배치 모듈 분리** — `rental-crm-batch` 별도 Spring Boot 앱. 백오피스가 트리거 API 호출 → 배치 앱이 실제 실행. Kafka 토픽 통신 정합 (배치 결과 → Kafka → 알림 INSERT). 학습 단계는 단일 앱 유지, 운영 이행 시점 ADR 작성 후 분리 (2026-05-12 결정 — 사용자 인사이트: "백오피스에서 호출은 하지만 실행은 타프로젝트, Kafka 와도 정합")
+- [ ] **배치 컨테이너화** — `rental-batch` Docker compose 추가 (학습 단계는 IDE 실행 OK, 운영 시점 컨테이너화)
+- [ ] **Spring Batch 도입 검토** — chunk / restart / skip 추상화 학습 (배치 손구현 후 비교 — ADR-014 후속)
 
 ### 정책 검토
 
@@ -93,3 +108,4 @@
   - `db-conventions §2-1` NUMBER NOT NULL DEFAULT 0 룰 신설
   - 코드 구조 강화: `CM_CODE_GROUP.SYSTEM_YN` + `CM_CODE.DESCRIPTION/PROP_VAL1~3` (ref-project sy_code_dtl 구조 차용)
   - **DDL/캐시 검증 미수행** (Docker 미가동) — 일과 끝 컨테이너 재생성 후 검증. 가정 시그니처 (CustomerRepository 등) 컴파일 오류 가능성.
+- **2026-05-13 4회차 진입 — ADR-014 채택 (배치 모듈 분리).** 2026-05-12 LATER §"배치 모듈 분리" 결정 폐기. `rental-batch` 별도 Spring Boot 앱 + `domain` 공유 모듈 + Gradle 멀티 모듈. 학습 단계와 최종 구조 동일하게 가는 결정. 도메인별 배치 시나리오 학습 플랫폼화 (청구 / 연체 / 수납·연체 / 미납 통계 / 에너지 동기 / 회계 갱신 / 통계 집계).

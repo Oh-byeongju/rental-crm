@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: rental-batch
+
+  profiles:
+    active: local
+
+  # ===== Datasource (Oracle 21c XE) — backoffice 와 같은 DB =====
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    username: rental
+    password: rental
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      pool-name: rental-batch-hikari-pool
+      connection-timeout: 30000
+
+  # ===== JPA =====
+  jpa:
+    hibernate:
+      ddl-auto: validate           # 스키마는 init-scripts/oracle/*.sql 이 권위. JPA 는 검증만.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+        format_sql: true
+        # bulk INSERT 학습 (Ch.1) — batch size 명시
+        jdbc.batch_size: 1000
+        order_inserts: true
+        order_updates: true
+    show-sql: true
+    open-in-view: false
+
+# ===== Server =====
+# 9092 = Kafka broker 충돌. 9093 사용.
+server:
+  port: ${SERVER_PORT:9093}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+# ===== Actuator =====
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+# ===== Logging =====
+logging:
+  level:
+    root: INFO
+    com.rental.batch: DEBUG
+    com.rental.domain: DEBUG
+    org.hibernate.SQL: DEBUG

@@ -69,5 +69,5 @@ GDI 의 그리드 패턴(컬럼/행 액션 버튼/체크박스 컬럼) 은 **기
 
 ## 6. 관련 룰
 
-- 백오피스 화면 디자인: `docs/global-rules/backend-ui-template.md` (작성 예정 — Tabler 또는 AdminLTE 채택 후)
+- 백오피스 화면 디자인: `docs/global-rules/backoffice-ui-template.md` (작성 예정 — Tabler 또는 AdminLTE 채택 후)
 - React 컨벤션: `customer-portal/guide/` (작성 예정)

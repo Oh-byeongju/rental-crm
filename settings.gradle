@@ -1,0 +1,5 @@
+rootProject.name = 'rental-crm'
+
+include 'domain'
+include 'backoffice'
+include 'batch'

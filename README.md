@@ -91,7 +91,7 @@ rental-crm/
 │   ├── init-scripts/oracle/   # 19 테이블 + 시퀀스 + 인덱스 + 시드 데이터 DDL
 │   ├── start.bat / stop.bat / status.bat / reset.bat   # Windows 더블클릭 운영
 │   └── guide/                 # 인프라 로컬 가이드
-├── backend/                   # Spring Boot 3.5 + Java 21
+├── backoffice/                   # Spring Boot 3.5 + Java 21
 │   ├── build.gradle
 │   ├── gradle.properties      # Gradle Toolchain (Java 21 경로)
 │   ├── src/main/java/com/rental/crm/
@@ -116,7 +116,7 @@ rental-crm/
 ## 🚀 실행 방법
 
 ### 사전 요구사항
-- Java 21 (시스템 JAVA_HOME 17 유지 가능 — `backend/gradle.properties` 에서 Java 21 경로 지정)
+- Java 21 (시스템 JAVA_HOME 17 유지 가능 — `backoffice/gradle.properties` 에서 Java 21 경로 지정)
 - Docker Desktop (메모리 4GB+ 권장 — Oracle 부담)
 
 ### 1. 인프라 기동 (한 번에)
@@ -134,7 +134,7 @@ docker compose up -d
 ### 2. 백엔드 기동
 
 ```powershell
-cd backend
+cd backoffice
 .\gradlew bootRun
 ```
 
@@ -186,8 +186,8 @@ reset.bat                  # YES 입력 필요
 | [ADR-002](docs/decisions/ADR-002-erd-ct-block-revision.md) | 사람이 읽는 식별자 (`CUST-YYYYMMDD-NNNNN` 등) + 일시정지 추적 |
 | [ADR-003](docs/decisions/ADR-003-erd-bl-block-revision.md) | bulk INSERT 측정 컬럼 (`TARGET_COUNT` / `SUCCESS_COUNT` / `DURATION_MS`) |
 | [ADR-004](docs/decisions/ADR-004-oracle-init-scripts-known-issue.md) | Oracle init scripts 알려진 이슈 + start.bat fallback |
-| [ADR-005](backend/guide/decisions/ADR-005-audit-columns-auto-injection.md) | 감사 9컬럼 자동 주입 — JPA Auditing + `@PrePersist`/`@PreUpdate` 혼합 |
-| [ADR-006](backend/guide/decisions/ADR-006-spring-boot-version.md) | Spring Boot 3.5.0 + Java 21 채택 (4.x 비채택 사유) |
+| [ADR-005](backoffice/guide/decisions/ADR-005-audit-columns-auto-injection.md) | 감사 9컬럼 자동 주입 — JPA Auditing + `@PrePersist`/`@PreUpdate` 혼합 |
+| [ADR-006](backoffice/guide/decisions/ADR-006-spring-boot-version.md) | Spring Boot 3.5.0 + Java 21 채택 (4.x 비채택 사유) |
 | [ADR-007](docs/decisions/ADR-007-ui-template-and-grid-library.md) | UI 템플릿 (Tabler) + 그리드 (AG Grid Community / TanStack Table) |
 | [ADR-008](docs/decisions/ADR-008-permission-model-auth-code.md) | 권한 모델 — 메뉴 × R/W/D 폐기, AUTH 키 단위 채택 (`CM_AUTH` / `CM_ROLE_AUTH`) |
 | [ADR-009](docs/decisions/ADR-009-user-direct-auth-grant-revoke.md) | 사용자 직접 권한 매핑 — 역할 폭증 회피 (`CM_USER_AUTH` GRANT/REVOKE) |

@@ -1,8 +1,8 @@
-# ===== Build outputs =====
-backend/build/
-backend/.gradle/
-backend/out/
-backend/bin/
+# ===== Build outputs (Gradle — root + 모든 모듈) =====
+.gradle/
+build/
+out/
+bin/
 customer-portal/node_modules/
 customer-portal/dist/
 customer-portal/build/

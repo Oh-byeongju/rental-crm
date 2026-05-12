@@ -1,0 +1,10 @@
+dependencies {
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.boot:spring-boot-starter-validation'
+
+    // ErrorCode 의 HttpStatus 위해 (web 코어만, starter-web 아님)
+    api 'org.springframework:spring-web'
+
+    // ApiResponse 의 @JsonInclude 위해
+    api 'com.fasterxml.jackson.core:jackson-annotations'
+}

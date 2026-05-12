@@ -1,7 +1,7 @@
 # `.claude/rules/` — 항상 로드되는 룰 (헌법)
 
 > 매 세션 자동 로드되는 **전역 필수 룰**. Claude 가 무조건 알아야 하는 메타·식별자·짧은 컨벤션.
-> 작업 시점에만 필요한 룰은 [`docs/global-rules/`](../../docs/global-rules/) (전역) 또는 [`{backend,customer-portal,infra}/guide/`](../../) (로컬) 에 있다.
+> 작업 시점에만 필요한 룰은 [`docs/global-rules/`](../../docs/global-rules/) (전역) 또는 [`{backoffice,customer-portal,infra}/guide/`](../../) (로컬) 에 있다.
 
 ---
 

@@ -26,10 +26,10 @@
 
 ## 후보 (작업 시점에 추가될 가능성)
 
-- API 응답 공통 포맷 (`{ code, message, data }`) — backend 발행 / portal 소비 → 둘 다 영향
-- Kafka 토픽 명명 / 페이로드 스키마 — 발행자(backend) / 소비자(backend) 양쪽 영향
-- ERD 변경 절차 — docs 산출물 / backend 엔티티 둘 다 영향
-- 에러 코드 체계 — backend / portal 둘 다 사용
+- API 응답 공통 포맷 (`{ code, message, data }`) — backoffice 발행 / portal 소비 → 둘 다 영향
+- Kafka 토픽 명명 / 페이로드 스키마 — 발행자(backoffice) / 소비자(backoffice) 양쪽 영향
+- ERD 변경 절차 — docs 산출물 / backoffice 엔티티 둘 다 영향
+- 에러 코드 체계 — backoffice / portal 둘 다 사용
 
 > 위 후보는 처음부터 만들지 않는다 — **두 디렉토리 이상에서 실제 필요해질 때** 추출 (점진적 추상화).
 

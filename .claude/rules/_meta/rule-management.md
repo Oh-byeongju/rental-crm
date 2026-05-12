@@ -27,7 +27,7 @@
 docs/global-rules/               ← 전역 룰 (작업 시점 Read, 모든 도메인 적용)
 └── ...                          ← API 응답 포맷, Kafka 토픽 설계 등
 
-{backend,customer-portal,infra}/guide/  ← 로컬 룰 (작업 시점 Read, 해당 디렉토리만)
+{backoffice,customer-portal,infra}/guide/  ← 로컬 룰 (작업 시점 Read, 해당 디렉토리만)
 └── ...                          ← JPA 컨벤션, React 컨벤션, Docker 설정 등
 ```
 
@@ -43,12 +43,12 @@ docs/global-rules/               ← 전역 룰 (작업 시점 Read, 모든 도�
 
 **Step 2 — 적용 범위가 여러 디렉토리?**
 
-- Yes (backend + portal + infra 둘 이상에 영향) → `docs/global-rules/`
+- Yes (backoffice + portal + infra 둘 이상에 영향) → `docs/global-rules/`
 - No (한 디렉토리에만 적용) → Step 3
 
 **Step 3 — 어느 디렉토리에 속함?**
 
-- backend 코드/도메인 룰 → `backend/guide/`
+- backoffice 코드/도메인 룰 → `backoffice/guide/`
 - portal 컨벤션 → `customer-portal/guide/`
 - infra 설정 → `infra/guide/`
 

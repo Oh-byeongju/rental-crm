@@ -18,7 +18,7 @@
 | 백오피스 UI | Thymeleaf + AdminLTE + DataTables.js |
 | 고객 포털 UI | React 18 + Zustand + Axios + AntD/MUI |
 | 결제 | Toss Payments |
-| 컨테이너 | Docker + docker-compose (infra / backend / frontend 레이어 분리) |
+| 컨테이너 | Docker + docker-compose (infra / backoffice / frontend 레이어 분리) |
 | CI/CD | GitHub Actions |
 | 트랜잭션 매니저 | `@Transactional` (기본) |
 | 패키지 루트 | `com.rental.crm` (확정 시 갱신) |
@@ -46,7 +46,7 @@
 | 영역 | 위치 |
 |---|---|
 | 전역 룰 (모든 도메인 적용) | [`docs/global-rules/`](../../../docs/global-rules/) |
-| 백엔드 로컬 룰 | [`backend/guide/`](../../../backend/guide/) |
+| 백엔드 로컬 룰 | [`backoffice/guide/`](../../../backoffice/guide/) |
 | 고객 포털 로컬 룰 | [`customer-portal/guide/`](../../../customer-portal/guide/) |
 | 인프라 로컬 룰 | [`infra/guide/`](../../../infra/guide/) |
 

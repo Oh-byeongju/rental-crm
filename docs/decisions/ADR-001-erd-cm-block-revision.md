@@ -94,7 +94,7 @@
 
 - [ ] CT_* 블록(6개 테이블) 동일 검토 절차 — ADR-002
 - [ ] BL_* 블록(4개 테이블) 동일 검토 절차 — ADR-003
-- [ ] 감사 컬럼 자동 주입 메커니즘 설계 — backend/guide/decisions/ 에 별도 ADR
+- [ ] 감사 컬럼 자동 주입 메커니즘 설계 — backoffice/guide/decisions/ 에 별도 ADR
 - [ ] 도메인 용어집 초기 골격 작성 (`docs/domain-terms/`)
 
 ---

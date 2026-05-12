@@ -42,8 +42,8 @@ rental-crm/
 ├── infra/                          ← Oracle / Kafka / Zookeeper / Redis
 │   ├── guide/                      ← infra 로컬 룰
 │   └── docker-compose.yml
-├── backend/                        ← Spring Boot (백오피스 Thymeleaf + REST API)
-│   ├── guide/                      ← backend 로컬 룰
+├── backoffice/                        ← Spring Boot (백오피스 Thymeleaf + REST API)
+│   ├── guide/                      ← backoffice 로컬 룰
 │   └── src/
 └── customer-portal/                ← React 고객 포털
     ├── guide/                      ← portal 로컬 룰
@@ -63,14 +63,14 @@ docker compose up -d
 
 ### 백엔드
 ```bash
-cd backend
+cd backoffice
 .\gradlew bootRun
 # 또는
 .\gradlew build && java -jar build/libs/*.jar
 ```
 
 > Java 21 경로 (사용자별 — 노트북 이주 시 갱신): `D:\Dev\JDK\openjdk-21+35_windows-x64_bin`
-> 시스템 JAVA_HOME 은 17 유지. `backend/gradle.properties` 의
+> 시스템 JAVA_HOME 은 17 유지. `backoffice/gradle.properties` 의
 > `org.gradle.java.installations.paths` 가 21 경로를 가리킴.
 > IntelliJ 도 동일 경로를 Gradle JDK 로 설정.
 

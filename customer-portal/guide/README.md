@@ -37,6 +37,6 @@ portal 한정 의사결정 기록 (ADR). 전역 영향 결정은 [`docs/decision
 
 1. 본 README 인덱스 표에 행 추가
 2. 룰 파일 첫 줄에 `description` frontmatter
-3. 두 번째 디렉토리(backend/infra) 에서도 같은 패턴이 등장하면 → **전역 룰** (`docs/global-rules/`) 로 승격 검토
+3. 두 번째 디렉토리(backoffice/infra) 에서도 같은 패턴이 등장하면 → **전역 룰** (`docs/global-rules/`) 로 승격 검토
 
 상세 절차: [`@.claude/rules/_meta/rule-management.md`](../../.claude/rules/_meta/rule-management.md)

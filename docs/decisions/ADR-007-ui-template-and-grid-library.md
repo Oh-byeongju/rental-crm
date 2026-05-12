@@ -85,5 +85,5 @@
 
 - [x] 03 산출물 갱신
 - [ ] 05 화면 설계서 작성 (Tabler 데모 매핑 + Stitch 시안 5개 자리)
-- [ ] backend/src/main/resources/static/ 에 Tabler + AG Grid 자산 배치 (코드 진입 시)
+- [ ] backoffice/src/main/resources/static/ 에 Tabler + AG Grid 자산 배치 (코드 진입 시)
 - [ ] customer-portal/ 에 React + Tailwind + shadcn/ui 셋업 (코드 진입 시)

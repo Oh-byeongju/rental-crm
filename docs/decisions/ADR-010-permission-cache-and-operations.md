@@ -5,7 +5,7 @@
 - **연관**:
   - `docs/decisions/ADR-008-permission-model-auth-code.md` (AUTH 키 단위)
   - `docs/decisions/ADR-009-user-direct-auth-grant-revoke.md` (사용자 GRANT/REVOKE)
-  - `backend/src/main/resources/application.yml` (Redis 설정)
+  - `backoffice/src/main/resources/application.yml` (Redis 설정)
   - 5단계 (관리자 도메인 구현) — `PermissionService` / `PermissionCacheService`
 
 ---

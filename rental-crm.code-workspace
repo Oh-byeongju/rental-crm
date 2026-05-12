@@ -1,6 +1,6 @@
 {
   "folders": [
-    { "name": "📦 backend",  "path": "backend" },
+    { "name": "📦 backoffice",  "path": "backoffice" },
     { "name": "🎨 portal",   "path": "customer-portal" },
     { "name": "🐳 infra",    "path": "infra" },
     { "name": "📄 docs",     "path": "docs" },

@@ -79,13 +79,13 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 |---|---|---|
 | `.claude/rules/` | **헌법 — 무조건 따른다** (메타·식별자·짧은 컨벤션) | 매 세션 자동 로드 |
 | `docs/global-rules/` | **전역 작업 시점 룰** (여러 디렉토리에 영향) | 명시 Read |
-| `{backend,customer-portal,infra}/guide/` | **로컬 작업 시점 룰** (해당 디렉토리만) | 명시 Read |
+| `{backoffice,customer-portal,infra}/guide/` | **로컬 작업 시점 룰** (해당 디렉토리만) | 명시 Read |
 
 - 항상 로드되는 룰 인덱스: @.claude/rules/README.md
 - 프로젝트 매핑 (식별자 표): @.claude/rules/project/README.md
 - 전역 작업 시점 룰 인덱스: [`docs/global-rules/README.md`](docs/global-rules/README.md)
 - 로컬 룰 인덱스:
-  - 백엔드: [`backend/guide/README.md`](backend/guide/README.md)
+  - 백엔드: [`backoffice/guide/README.md`](backoffice/guide/README.md)
   - 고객 포털: [`customer-portal/guide/README.md`](customer-portal/guide/README.md)
   - 인프라: [`infra/guide/README.md`](infra/guide/README.md)
 
