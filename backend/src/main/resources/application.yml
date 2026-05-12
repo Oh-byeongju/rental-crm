@@ -74,10 +74,11 @@ spring:
     suffix: .html
 
 # ===== Server =====
-# 8080 은 흔히 점유됨 (다른 Spring Boot 또는 Docker 등)
-# rental-crm 은 8081 사용. .env 또는 SERVER_PORT 환경변수로 override 가능.
+# Windows + Docker Desktop / WSL2 환경에서 Hyper-V (`hns`) 가 1024 부터 동적 포트를 잡아
+# 8080-8679 가 부팅 시 통째로 예약되는 경우가 잦음 (8080, 8081 모두 영향).
+# 백오피스는 9091 사용 (예약 범위 밖). SERVER_PORT 환경변수로 override 가능.
 server:
-  port: ${SERVER_PORT:8081}
+  port: ${SERVER_PORT:9091}
   servlet:
     context-path: /
     encoding:

@@ -95,6 +95,26 @@ npm run dev
 
 ---
 
+## 포트 매핑
+
+| 서비스 | 포트 | 비고 |
+|---|---|---|
+| 백오피스 (Spring Boot) | **9091** | Hyper-V 동적 예약 회피 (2026-05-12 8081→9091) |
+| Kafka UI | **9090** | Hyper-V 동적 예약 회피 (`infra/.env` `KAFKA_UI_PORT`) |
+| Oracle XE | 1521 | |
+| Redis | 6379 | |
+| Kafka Broker | 9092 | |
+
+> **Hyper-V 동적 포트 예약 회피**: Windows + Docker Desktop / WSL2 환경에서 `hns` 가
+> TCP 동적 포트 시작점을 1024 로 내림. 이 상태에서 부팅 시 Hyper-V 가 8000번대를 통째로
+> 예약하는 경우가 잦음 (비결정적 — 어쩌다 잘 될 때도 있음). 8080-8679 회피 위해
+> 백오피스 9091 · Kafka UI 9090 사용. 새 PC 이주 시 다음으로 예약 범위 확인:
+> ```
+> netsh interface ipv4 show excludedportrange protocol=tcp
+> ```
+
+---
+
 ## 핵심 아키텍처 결정
 
 | 결정 | 이유 | 산출물 |
