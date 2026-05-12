@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('수납 상세')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">
+                            <a th:href="@{/admin/payments}"><i class="ti ti-arrow-left"></i> 수납 목록</a>
+                        </div>
+                        <h2 class="page-title">
+                            <span th:text="${payment.paymentNo}">PAY-202605-000001</span>
+                            <span class="ms-2 badge"
+                                  th:classappend="${payment.paymentStatus == 'COMPLETED'} ? 'bg-green-lt'
+                                                  : (${payment.paymentStatus == 'CANCELLED'} ? 'bg-red-lt' : 'bg-orange-lt')"
+                                  th:text="${payment.paymentStatus}">COMPLETED</span>
+                        </h2>
+                    </div>
+                    <div class="col-auto ms-auto d-print-none">
+                        <input type="hidden" id="paymentId" th:value="${payment.paymentId}">
+                        <input type="hidden" id="paymentStatus" th:value="${payment.paymentStatus}">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-warning"
+                                    th:disabled="${payment.paymentStatus != 'COMPLETED'}"
+                                    onclick="PaymentDetail.cancel()">
+                                <i class="ti ti-x"></i> 취소
+                            </button>
+                            <button type="button" class="btn btn-danger"
+                                    th:disabled="${payment.paymentStatus != 'COMPLETED'}"
+                                    onclick="PaymentDetail.refund()">
+                                <i class="ti ti-arrow-back-up"></i> 환불
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-header"><h3 class="card-title">수납 정보</h3></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">수납번호</label>
+                                <div class="fw-bold" th:text="${payment.paymentNo}">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">상태</label>
+                                <div th:text="${payment.paymentStatus}">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">청구</label>
+                                <div>
+                                    <a th:href="@{/admin/billings}" class="text-primary"
+                                       th:text="${payment.billingNo}">BL-202605-000001</a>
+                                    <small class="text-secondary" th:text="'(' + ${payment.billingMonth} + ')'"></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary">고객</label>
+                                <div>
+                                    <span th:text="${payment.customerName}">홍길동</span>
+                                    <small class="text-secondary" th:text="'(' + ${payment.customerNo} + ')'"></small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">수납 금액</label>
+                                <div th:text="${#numbers.formatInteger(payment.paymentAmount, 3, 'COMMA')} + ' 원'">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">결제수단</label>
+                                <div th:text="${payment.paymentMethod}">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">수납일</label>
+                                <div th:text="${payment.paymentDate}">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">등록일시</label>
+                                <div th:text="${#temporals.format(payment.createdAt, 'yyyy-MM-dd HH:mm')}">-</div>
+                            </div>
+                            <div class="col-md-6" th:if="${payment.tossOrderId != null}">
+                                <label class="form-label text-secondary">Toss 주문번호</label>
+                                <div th:text="${payment.tossOrderId}">-</div>
+                            </div>
+                            <div class="col-md-6" th:if="${payment.tossPaymentKey != null}">
+                                <label class="form-label text-secondary">Toss 결제키</label>
+                                <div th:text="${payment.tossPaymentKey}">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3" th:if="${payment.cancelledAt != null}">
+                    <div class="card-header"><h3 class="card-title">취소 / 환불 이력</h3></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label text-secondary">처리일시</label>
+                                <div th:text="${#temporals.format(payment.cancelledAt, 'yyyy-MM-dd HH:mm')}">-</div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label text-secondary">사유</label>
+                                <div th:text="${payment.cancelReason}">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 사유 모달 (cancel / refund 공용) -->
+<div class="modal modal-blur fade" id="reasonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reasonModalTitle">사유 입력</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reasonForm">
+                    <label class="form-label required">사유</label>
+                    <textarea name="reason" class="form-control" rows="3" required maxlength="1000"
+                              placeholder="예: 고객 요청 / 결제 오류 / 환불 사유"></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="PaymentDetail.submitReason()">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/payment-detail.js}"></script>
+</body>
+</html>

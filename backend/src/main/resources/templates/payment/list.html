@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('수납 관리')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">청구/수납</div>
+                        <h2 class="page-title">수납 관리</h2>
+                        <p class="text-secondary mt-1">수동 결제 등록 (관리자 직접 입력). 행 클릭 = 상세.</p>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary" onclick="PaymentForm.openRegister()">
+                            <i class="ti ti-plus me-1"></i> 수납 등록
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return PaymentList.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">수납번호</label>
+                                <input type="text" name="paymentNo" class="form-control" placeholder="PAY-202605-000001">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">고객</label>
+                                <select name="customerId" id="searchCustomerId" class="form-select">
+                                    <option value="">전체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">결제수단</label>
+                                <select name="paymentMethod" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="CARD">카드</option>
+                                    <option value="BANK">계좌이체</option>
+                                    <option value="CASH">현금</option>
+                                    <option value="TOSS">Toss</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">상태</label>
+                                <select name="paymentStatus" class="form-select">
+                                    <option value="">전체</option>
+                                    <option value="COMPLETED">완료</option>
+                                    <option value="CANCELLED">취소</option>
+                                    <option value="REFUNDED">환불</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">수납일 (From)</label>
+                                <input type="date" name="dateFrom" class="form-control">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">수납일 (To)</label>
+                                <input type="date" name="dateTo" class="form-control">
+                            </div>
+                            <div class="col-md-10 d-flex justify-content-end align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="PaymentList.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="paymentGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 수납 등록 모달 -->
+<div class="modal modal-blur fade" id="registerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">수납 등록 (수동)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="row g-2">
+                        <div class="col-md-12">
+                            <label class="form-label required">청구</label>
+                            <select name="billingId" id="registerBillingId" class="form-select" required>
+                                <option value="">— 수납 가능 청구 선택 —</option>
+                            </select>
+                            <small class="text-secondary">UNPAID / OVERDUE 청구만 표시</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label required">수납 금액</label>
+                            <input type="number" name="paymentAmount" class="form-control" required min="1"
+                                   placeholder="청구 금액과 일치 (분할 X)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label required">결제수단</label>
+                            <select name="paymentMethod" class="form-select" required>
+                                <option value="">선택</option>
+                                <option value="CARD">카드</option>
+                                <option value="BANK">계좌이체</option>
+                                <option value="CASH">현금</option>
+                                <option value="TOSS">Toss</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label required">수납일</label>
+                            <input type="date" name="paymentDate" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Toss 주문번호</label>
+                            <input type="text" name="tossOrderId" class="form-control" maxlength="200"
+                                   placeholder="METHOD=TOSS 일 때만">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Toss 결제키</label>
+                            <input type="text" name="tossPaymentKey" class="form-control" maxlength="200">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="PaymentForm.submitRegister()">등록</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/payment-list.js}"></script>
+<script th:src="@{/js/payment-form.js}"></script>
+</body>
+</html>
