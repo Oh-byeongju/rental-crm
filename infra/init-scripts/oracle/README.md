@@ -24,13 +24,13 @@
 |---|---|---|
 | 테이블 | **19** | CM 9 + CT 6 + BL 4 |
 | 시퀀스 | 17 | VARCHAR PK 테이블 (CM_CODE_GROUP / CM_AUTH) 제외 |
-| 인덱스 | 24 | PK/UNIQUE 외 보조 인덱스 |
+| 인덱스 | 25 | PK/UNIQUE 외 보조 인덱스 |
 | 코드 그룹 | 6 | EQUIPMENT_TYPE / CONTRACT_STATUS / BILLING_STATUS / PAYMENT_METHOD / VISIT_TYPE / NOTIFICATION_TYPE |
-| 코드값 | 24 | |
+| 코드값 | 22 | |
 | 역할 | 3 | SUPER_ADMIN / ADMIN / VIEWER |
-| 메뉴 | 23 | GROUP 7 + LEAF 16 (2-depth 트리) |
-| AUTH 키 | 57 | `{모듈}_{액션}` 명명 (ADR-008) |
-| 역할-권한 매핑 | 107 | SUPER 57 + ADMIN 37 + VIEWER 13 |
+| 메뉴 | 24 | GROUP 7 + LEAF 17 (2-depth 트리) |
+| AUTH 키 | 59 | `{모듈}_{액션}` 명명 (ADR-008) |
+| 역할-권한 매핑 | 111 | SUPER 59 + ADMIN 39 + VIEWER 13 |
 
 ADR-008/009 권한 모델로 `CM_ROLE_MENU` 폐기 → `CM_AUTH` / `CM_ROLE_AUTH` / `CM_USER_AUTH` 신설.
 사용자 (`CM_USER`) 는 AdminSeeder (ApplicationRunner) 가 첫 부팅 시 admin@rental.com / Admin1234! 자동 INSERT.
