@@ -114,7 +114,7 @@
                     <select id="roundNo" class="form-select">
                         <option value="1">R1 — single-save (건별 save)</option>
                         <option value="2">R2 — chunk-flush (1000건마다 flush + clear)</option>
-                        <option value="3" disabled>R3 — bulk INSERT (Step 7-C)</option>
+                        <option value="3">R3 — bulk-jdbc (JdbcTemplate batchUpdate, JPA 우회)</option>
                         <option value="4" disabled>R4 — chunk commit (Step 7-C)</option>
                         <option value="5" disabled>R5 — UNDO 폭주 (Step 7-C)</option>
                         <option value="6" disabled>R6 — 멱등성 (Step 7-C)</option>

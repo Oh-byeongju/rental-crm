@@ -24,6 +24,7 @@ const BatchTrigger = (() => {
         }
         const strategy = roundNo === 1 ? 'single-save'
                        : roundNo === 2 ? 'chunk-flush'
+                       : roundNo === 3 ? 'bulk-jdbc'
                        : null;
         if (!strategy) { App.toast('해당 라운드는 Step 7-C 에서 지원', 'error'); return; }
 

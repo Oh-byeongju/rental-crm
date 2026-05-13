@@ -55,7 +55,9 @@ public class BillingCreateService {
                     + " (available: " + strategiesByName.keySet() + ")");
         }
 
-        var batchLog = batchLogRepository.save(BatchLog.builder()
+        // saveAndFlush — JPA 우회 strategy (BulkJdbcStrategy) 가 BATCH_LOG_ID FK 참조 시
+        // BL_BATCH_LOG INSERT 가 DB 에 즉시 박혀 있어야 함 (ORA-02291 회피).
+        var batchLog = batchLogRepository.saveAndFlush(BatchLog.builder()
                 .batchType(BatchLog.TYPE_BILLING_CREATE)
                 .billingMonth(billingMonth)
                 .roundNo(roundNo)
@@ -72,6 +74,11 @@ public class BillingCreateService {
 
             int success = strategy.execute(active, batchLogId, billingMonth);
 
+            // ADR-014 Step 7-B 버그 fix:
+            // chunk-flush 계열 strategy 가 em.clear() 호출 시 batchLog 도 detach 됨.
+            // detached entity 의 setter 는 dirty checking 안 됨 → UPDATE 안 나감.
+            // findById 로 fresh managed entity 재로드.
+            batchLog = batchLogRepository.findById(batchLogId).orElseThrow();
             batchLog.setCounters(active.size(), success, active.size() - success);
             batchLog.markCompleted();
 
