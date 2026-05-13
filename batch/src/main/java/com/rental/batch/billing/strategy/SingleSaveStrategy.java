@@ -5,6 +5,7 @@ import com.rental.domain.billing.repository.BillingRepository;
 import com.rental.domain.contract.entity.Contract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class SingleSaveStrategy implements BillingInsertStrategy {
     public String name() { return "single-save"; }
 
     @Override
+    @Transactional
     public int execute(List<Contract> contracts, Long batchLogId, String billingMonth) {
         int n = 0;
         for (Contract c : contracts) {

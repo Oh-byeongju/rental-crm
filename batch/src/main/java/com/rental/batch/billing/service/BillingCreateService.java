@@ -2,52 +2,43 @@ package com.rental.batch.billing.service;
 
 import com.rental.batch.billing.strategy.BillingInsertStrategy;
 import com.rental.domain.billing.entity.BatchLog;
-import com.rental.domain.billing.repository.BatchLogRepository;
 import com.rental.domain.contract.entity.Contract;
 import com.rental.domain.contract.repository.ContractRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Ch.1 청구 일괄 생성 — 6 라운드 측정의 본 서비스.
+ * Ch.1 청구 일괄 생성 dispatcher (Step 7-C-2 리팩터).
  *
- * <p>흐름:
- * <ol>
- *   <li>{@code BL_BATCH_LOG} INSERT (RUNNING) — strategy / round 메타 박음</li>
- *   <li>활성 계약 전체 로드</li>
- *   <li>strategy 실행 (R1 single-save / R2 chunk-flush ...)</li>
- *   <li>카운터 일괄 update + COMPLETED</li>
- * </ol>
+ * <p>**외부 tx 없음.** batchLog 작업은 {@link BatchLogManager} (REQUIRES_NEW), strategy 자체 tx.
+ * <ul>
+ *   <li>R1/R2/R3 strategy = 각자 클래스 level @Transactional — 한 번 호출 = 한 tx</li>
+ *   <li>R4 ChunkCommitStrategy = tx 없음, chunk 마다 REQUIRES_NEW 자체 발동</li>
+ * </ul>
  *
- * <p>호출 측 {@link com.rental.batch.trigger.service.BatchRunnerService} 가 {@code @Async + REQUIRES_NEW}.
- * 본 메서드는 그 트랜잭션에 합류 (PROPAGATION.REQUIRED).
+ * <p>실패 시 strategy tx 만 rollback. batchLog 행은 BatchLogManager 가 REQUIRES_NEW 로 commit 한 상태 보존.
  */
 @Slf4j
 @Service
 public class BillingCreateService {
 
     private final ContractRepository contractRepository;
-    private final BatchLogRepository batchLogRepository;
+    private final BatchLogManager batchLogManager;
     private final Map<String, BillingInsertStrategy> strategiesByName;
 
-    /**
-     * Spring 가 같은 인터페이스의 모든 구현 bean 을 List 로 주입 후, 본 생성자에서 name() → strategy 맵으로 변환.
-     */
     public BillingCreateService(ContractRepository contractRepository,
-                                BatchLogRepository batchLogRepository,
+                                BatchLogManager batchLogManager,
                                 List<BillingInsertStrategy> strategies) {
         this.contractRepository = contractRepository;
-        this.batchLogRepository = batchLogRepository;
+        this.batchLogManager = batchLogManager;
         this.strategiesByName = strategies.stream()
                 .collect(java.util.stream.Collectors.toUnmodifiableMap(
                         BillingInsertStrategy::name, s -> s));
     }
 
-    @Transactional
     public void createMonthly(String billingMonth, Integer roundNo, String strategyName) {
         var strategy = strategiesByName.get(strategyName);
         if (strategy == null) {
@@ -55,40 +46,24 @@ public class BillingCreateService {
                     + " (available: " + strategiesByName.keySet() + ")");
         }
 
-        // saveAndFlush — JPA 우회 strategy (BulkJdbcStrategy) 가 BATCH_LOG_ID FK 참조 시
-        // BL_BATCH_LOG INSERT 가 DB 에 즉시 박혀 있어야 함 (ORA-02291 회피).
-        var batchLog = batchLogRepository.saveAndFlush(BatchLog.builder()
-                .batchType(BatchLog.TYPE_BILLING_CREATE)
-                .billingMonth(billingMonth)
-                .roundNo(roundNo)
-                .batchParams("{\"strategy\":\"" + strategyName + "\"}")
-                .build());
-        var batchLogId = batchLog.getBatchLogId();
+        var batchLogId = batchLogManager.start(BatchLog.TYPE_BILLING_CREATE, billingMonth, roundNo, strategyName);
 
         try {
             log.info("[billing-create] R{} start — month={} strategy={} batchLogId={}",
                      roundNo, billingMonth, strategyName, batchLogId);
 
+            // findAllActive() 는 SimpleJpaRepository 의 @Transactional(readOnly=true) 로 자체 tx.
             List<Contract> active = contractRepository.findAllActive();
-            batchLog.markTargetCount(active.size());
+            batchLogManager.markTarget(batchLogId, active.size());
 
             int success = strategy.execute(active, batchLogId, billingMonth);
 
-            // ADR-014 Step 7-B 버그 fix:
-            // chunk-flush 계열 strategy 가 em.clear() 호출 시 batchLog 도 detach 됨.
-            // detached entity 의 setter 는 dirty checking 안 됨 → UPDATE 안 나감.
-            // findById 로 fresh managed entity 재로드.
-            batchLog = batchLogRepository.findById(batchLogId).orElseThrow();
-            batchLog.setCounters(active.size(), success, active.size() - success);
-            batchLog.markCompleted();
-
-            log.info("[billing-create] R{} done — target={} success={} duration={}ms",
-                     roundNo, active.size(), success, batchLog.getDurationMs());
+            batchLogManager.complete(batchLogId, active.size(), success, active.size() - success);
+            log.info("[billing-create] R{} done — target={} success={}", roundNo, active.size(), success);
         } catch (RuntimeException e) {
-            // 트랜잭션 rollback 되어도 batchLog 의 markFailed 는 별도 트랜잭션 필요할 수 있음.
-            // 현재 단순화 — 호출 측 BatchRunnerService 가 markFailed 처리 (REQUIRES_NEW 라 catch 가 별도 작동)
             log.error("[billing-create] R{} failed — month={} strategy={}",
                       roundNo, billingMonth, strategyName, e);
+            batchLogManager.fail(batchLogId, e.getMessage());
             throw e;
         }
     }

@@ -29,8 +29,8 @@
   - [x] **7-B 코드** — Strategy 패턴 (`BillingInsertStrategy` interface + `SingleSaveStrategy` R1 + `ChunkFlushClearStrategy` R2) + `BillingCreateService` (5만 contract 로드 → 전략 실행) + batch runner 분기 + 화면 BILLING_CREATE 카드/모달 (month/round 입력)
   - [x] **7-B 측정** — Docker 재기동 + 시드 + bootRun + 실 호출 → **R1 6,482ms / R2 21,543ms** (R2 가 R1 의 3.3배). 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-vs-r2.md`](perf-reports/2026-05-13-billing-create-r1-vs-r2.md). **버그 발견**: `em.clear()` 가 batchLog 도 detach → R2 STATUS 미갱신 (BL_BILLING 5만 행은 정상 INSERT).
   - [x] **7-C-1** — 버그 fix (saveAndFlush + findById reload) + R3 측정 (bulk-jdbc 16,222 ms). **R3 가 R1 보다 느린 의외 결과** — SEQ.NEXTVAL NOCACHE + INCREMENT_BY=50 호출 횟수 50배 차이. 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-r2-r3.md`](perf-reports/2026-05-13-billing-create-r1-r2-r3.md)
-  - [ ] **7-C-2** — R4 chunk commit (트랜잭션 분할) ← **다음 세션 시작 지점**
-  - [ ] **7-C-3** — R5 UNDO 폭주 (Oracle UNDO tablespace 5MB 강제) + R6 멱등성 (UNIQUE 위반 처리 — SKIP / MERGE / catch+continue 비교)
+  - [x] **7-C-2** — 대규모 리팩터 (`BatchLogManager` REQUIRES_NEW + R1~R3 strategy 자체 tx) + R4 chunk-commit 측정 (27,876 ms). **R4 가 가장 느림** — LGWR 50회 commit 비용. 학습: chunk commit 의 진짜 가치는 성능 X, R5 UNDO 폭주에서 진가. 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md`](perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md)
+  - [ ] **7-C-3** — R5 UNDO 폭주 (Oracle UNDO tablespace 5MB 강제) + R6 멱등성 (UNIQUE 위반 처리 — catch+continue / SELECT 후 INSERT / MERGE 비교) ← **다음 세션 시작 지점**
 - [ ] **Step 8** — UNDO 폭주 재현 환경 (Docker oracle 작은 UNDO tablespace 강제)
 - [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습)
 - [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계)

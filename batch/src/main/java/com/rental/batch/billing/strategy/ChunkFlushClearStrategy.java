@@ -6,6 +6,7 @@ import com.rental.domain.contract.entity.Contract;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class ChunkFlushClearStrategy implements BillingInsertStrategy {
     public String name() { return "chunk-flush"; }
 
     @Override
+    @Transactional
     public int execute(List<Contract> contracts, Long batchLogId, String billingMonth) {
         int n = 0;
         for (Contract c : contracts) {

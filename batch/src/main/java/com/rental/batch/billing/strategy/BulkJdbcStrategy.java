@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -48,6 +49,7 @@ public class BulkJdbcStrategy implements BillingInsertStrategy {
     public String name() { return "bulk-jdbc"; }
 
     @Override
+    @Transactional
     public int execute(List<Contract> contracts, Long batchLogId, String billingMonth) {
         var yyyymm = billingMonth.replace("-", "");
         var issueDate = Timestamp.valueOf(LocalDate.parse(billingMonth + "-01").atStartOfDay());
