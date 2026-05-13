@@ -16,13 +16,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 배치 실행 이력 — `BL_BATCH_LOG`. Ch.1 학습 핵심 — 멱등성 + 성능 측정.
+ * 배치 실행 이력 — `BL_BATCH_LOG`. Ch.1 학습 핵심 — 6 라운드 측정 + 멱등성.
  *
- * <p>정책 (Ch.1):
+ * <p>정책:
  * <ul>
- *   <li>BATCH_TYPE: BILLING_CREATE (월 청구 일괄 생성) / OVERDUE_UPDATE (연체 배치)</li>
- *   <li>멱등성: UNIQUE (BATCH_TYPE, BILLING_MONTH) — 동일 청구월 중복 실행 차단</li>
- *   <li>DURATION_MS: 성능 측정용 (Ch.1 — 건별 INSERT vs JDBC bulk INSERT 비교)</li>
+ *   <li>BATCH_TYPE: 자유 문자열. {@code TYPE_*} 상수가 진실 (DB CHECK 제거 — ADR-014 Step 7-A)</li>
+ *   <li>멱등성: Java 측 (Service) 에서 SELECT 후 INSERT 또는 Oracle MERGE — DB UNIQUE 제거</li>
+ *   <li>DURATION_MS / ROUND_NO / BATCH_PARAMS: Ch.1 6 라운드 측정 비교</li>
  *   <li>BATCH_STATUS: RUNNING → COMPLETED / FAILED</li>
  * </ul>
  */
@@ -83,8 +83,17 @@ public class BatchLog extends BaseAuditEntity {
     @Column(name = "COMPLETED_AT")
     private LocalDateTime completedAt;
 
+    /** Ch.1 6 라운드 측정 비교용 (1~6). 운영 시점 NULL. */
+    @Column(name = "ROUND_NO")
+    private Integer roundNo;
+
+    /** JSON — chunk_size, strategy 등 학습 파라미터. */
+    @Column(name = "BATCH_PARAMS", length = 500)
+    private String batchParams;
+
     @Builder
-    private BatchLog(String batchType, String billingMonth, Integer targetCount) {
+    private BatchLog(String batchType, String billingMonth, Integer targetCount,
+                     Integer roundNo, String batchParams) {
         this.batchType    = batchType;
         this.billingMonth = billingMonth;
         this.batchStatus  = STATUS_RUNNING;
@@ -93,6 +102,8 @@ public class BatchLog extends BaseAuditEntity {
         this.successCount = 0;
         this.failCount    = 0;
         this.startedAt    = LocalDateTime.now();
+        this.roundNo      = roundNo;
+        this.batchParams  = batchParams;
     }
 
     // ===== 도메인 행위 =====
