@@ -23,8 +23,8 @@
 
 ### 1-2. 배치 학습 본체 (Step 6~10)
 
-- [ ] **Step 6** — 배치 시나리오 정의 (`docs/100. 배치 시나리오 정의.md` — 도메인별 메뉴 분류)
-- [ ] **Step 7** — **Ch.1 청구 배치 6 라운드 측정** (본 학습 본체 — bulk INSERT / chunk commit / UNDO / 메모리 / 재시작)
+- [x] **Step 6** — 배치 시나리오 정의 (`docs/100. 배치 시나리오 정의.md` — 7 시나리오 + Ch.1 6 라운드 계획)
+- [ ] **Step 7** — **Ch.1 청구 배치 6 라운드 측정** (본 학습 본체 — bulk INSERT / chunk commit / UNDO / 메모리 / 재시작) ← **다음 세션 시작 지점**
 - [ ] **Step 8** — UNDO 폭주 재현 환경 (Docker oracle 작은 UNDO tablespace 강제)
 - [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습)
 - [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계)
