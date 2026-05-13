@@ -34,6 +34,9 @@ public class BatchLog extends BaseAuditEntity {
 
     public static final String TYPE_BILLING_CREATE = "BILLING_CREATE";
     public static final String TYPE_OVERDUE_UPDATE = "OVERDUE_UPDATE";
+    /** ADR-014 Step 5 — 통신 뼈대 검증용 더미. Step 7 실 시나리오 도입 시 제거 후보. */
+    public static final String TYPE_DUMMY_SUCCESS  = "DUMMY_SUCCESS";
+    public static final String TYPE_DUMMY_FAIL     = "DUMMY_FAIL";
 
     public static final String STATUS_RUNNING   = "RUNNING";
     public static final String STATUS_COMPLETED = "COMPLETED";

@@ -19,7 +19,7 @@
 - [x] **Step 2** — Gradle 멀티 모듈 빌드 (root `settings.gradle` + 모듈별 `build.gradle` × 3)
 - [x] **Step 3** — `domain` 모듈 추출 (Entity 19 + Repository 19 + BaseAuditEntity + AuditContext + ApiResponse/PageResponse + BusinessException/ErrorCode)
 - [x] **Step 4** — batch 앱 스켈레톤 (`BatchApplication` + 포트 9093 + `application.yml`)
-- [ ] **Step 5** — backoffice → batch REST 트리거 (비동기 fire-and-forget + DB `BL_BATCH_LOG` 폴링) ← **다음 세션 시작 지점**
+- [x] **Step 5** — backoffice → batch REST 트리거 (RestClient + X-Internal-Token + 더미 시나리오 2종) ← **다음 세션 시작 지점은 Step 6**
 
 ### 1-2. 배치 학습 본체 (Step 6~10)
 
@@ -109,3 +109,4 @@
   - 코드 구조 강화: `CM_CODE_GROUP.SYSTEM_YN` + `CM_CODE.DESCRIPTION/PROP_VAL1~3` (ref-project sy_code_dtl 구조 차용)
   - **DDL/캐시 검증 미수행** (Docker 미가동) — 일과 끝 컨테이너 재생성 후 검증. 가정 시그니처 (CustomerRepository 등) 컴파일 오류 가능성.
 - **2026-05-13 4회차 진입 — ADR-014 채택 (배치 모듈 분리).** 2026-05-12 LATER §"배치 모듈 분리" 결정 폐기. `rental-batch` 별도 Spring Boot 앱 + `domain` 공유 모듈 + Gradle 멀티 모듈. 학습 단계와 최종 구조 동일하게 가는 결정. 도메인별 배치 시나리오 학습 플랫폼화 (청구 / 연체 / 수납·연체 / 미납 통계 / 에너지 동기 / 회계 갱신 / 통계 집계).
+- **2026-05-13 4회차 Step 5 완료** — backoffice ↔ batch 통신 뼈대. RestClient (Spring 6.1+) + X-Internal-Token 공유 시크릿 + @Async fire-and-forget. 더미 시나리오 (DUMMY_SUCCESS/FAIL) 로 success/failure 양 경로 검증. `/admin/batch-trigger` 페이지 + `BATCH_TRIGGER_*` 권한 시드. 컴파일 통과, 실 호출 검증은 다음 docker 재기동 후.

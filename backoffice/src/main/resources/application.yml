@@ -116,6 +116,12 @@ app:
     default-pgm-id: SYSTEM
     default-user-id: SYSTEM
 
+  # ===== batch 모듈 호출 (ADR-014 Step 5) =====
+  internal:
+    batch:
+      base-url: ${BATCH_BASE_URL:http://localhost:9093}
+      token: ${BATCH_INTERNAL_TOKEN:dev-secret-change-me}
+
 # ===== Logging =====
 logging:
   level:

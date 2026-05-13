@@ -48,6 +48,13 @@ management:
       exposure:
         include: health,info,metrics
 
+# ===== ADR-014 Step 5 — 내부 호출 토큰 (X-Internal-Token) =====
+# backoffice application.yml 의 app.internal.batch.token 과 동일해야 함.
+app:
+  internal:
+    batch:
+      token: ${BATCH_INTERNAL_TOKEN:dev-secret-change-me}
+
 # ===== Logging =====
 logging:
   level:
