@@ -15,8 +15,7 @@
                         <div class="page-pretitle">청구/수납</div>
                         <h2 class="page-title">배치 실행</h2>
                         <p class="text-secondary mt-1">
-                            ADR-014 Step 5 — backoffice → batch REST 통신 검증용 더미 시나리오.
-                            실 시나리오는 Step 7 (Ch.1 청구 배치) 부터 추가됨.
+                            ADR-014 Step 5/7 — 통신 검증용 더미 + Ch.1 청구 배치 (R1/R2 가용, R3~R6 Step 7-C).
                         </p>
                     </div>
                     <div class="col-auto">
@@ -30,8 +29,10 @@
 
         <div class="page-body">
             <div class="container-xl">
-                <div class="row row-cards">
 
+                <!-- 더미 시나리오 (Step 5) -->
+                <h3 class="text-secondary mb-2">통신 뼈대 검증 (Step 5)</h3>
+                <div class="row row-cards mb-4">
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
@@ -39,19 +40,14 @@
                                     <i class="ti ti-circle-check text-success me-1"></i>
                                     DUMMY_SUCCESS
                                 </h3>
-                                <p class="text-secondary">
-                                    500ms 대기 후 정상 종료. <code>BL_BATCH_LOG</code> 에
-                                    <span class="badge bg-success-lt">COMPLETED</span> 한 줄 기록.
-                                </p>
-                                <button type="button"
-                                        class="btn btn-success w-100"
-                                        onclick="BatchTrigger.run('DUMMY_SUCCESS')">
+                                <p class="text-secondary">500ms 대기 후 정상 종료.</p>
+                                <button type="button" class="btn btn-success w-100"
+                                        onclick="BatchTrigger.runDummy('DUMMY_SUCCESS')">
                                     <i class="ti ti-player-play me-1"></i> 실행
                                 </button>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
@@ -59,20 +55,79 @@
                                     <i class="ti ti-alert-triangle text-danger me-1"></i>
                                     DUMMY_FAIL
                                 </h3>
-                                <p class="text-secondary">
-                                    200ms 대기 후 강제 실패. <code>BL_BATCH_LOG</code> 에
-                                    <span class="badge bg-danger-lt">FAILED</span> + ERROR_MSG 기록.
-                                </p>
-                                <button type="button"
-                                        class="btn btn-danger w-100"
-                                        onclick="BatchTrigger.run('DUMMY_FAIL')">
+                                <p class="text-secondary">200ms 대기 후 강제 실패.</p>
+                                <button type="button" class="btn btn-danger w-100"
+                                        onclick="BatchTrigger.runDummy('DUMMY_FAIL')">
                                     <i class="ti ti-player-play me-1"></i> 실행
                                 </button>
                             </div>
                         </div>
                     </div>
-
                 </div>
+
+                <!-- Ch.1 청구 배치 -->
+                <h3 class="text-secondary mb-2">Ch.1 청구 일괄 생성 — 6 라운드 측정 (Step 7)</h3>
+                <div class="row row-cards">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">
+                                    <i class="ti ti-receipt-2 text-primary me-1"></i>
+                                    BILLING_CREATE
+                                </h3>
+                                <p class="text-secondary">
+                                    활성 계약 전체 (5만건) 에 대해 해당 월 청구 INSERT.
+                                    전략별 성능 차이를 <code>BL_BATCH_LOG.DURATION_MS</code> 로 비교.
+                                </p>
+                                <button type="button" class="btn btn-primary w-100"
+                                        data-bs-toggle="modal" data-bs-target="#billingCreateModal">
+                                    <i class="ti ti-settings-bolt me-1"></i> 시나리오 설정 후 실행
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BILLING_CREATE 모달 -->
+<div class="modal fade" id="billingCreateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">BILLING_CREATE 실행</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label required">청구월 (YYYY-MM)</label>
+                    <input type="text" id="billingMonth" class="form-control"
+                           placeholder="2026-01" value="2026-01"
+                           pattern="^\d{4}-(0[1-9]|1[0-2])$">
+                    <small class="form-hint">라운드별 다른 month 권장 (UNIQUE 제약 회피).</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required">라운드 번호 (1~6)</label>
+                    <select id="roundNo" class="form-select">
+                        <option value="1">R1 — single-save (건별 save)</option>
+                        <option value="2">R2 — chunk-flush (1000건마다 flush + clear)</option>
+                        <option value="3" disabled>R3 — bulk INSERT (Step 7-C)</option>
+                        <option value="4" disabled>R4 — chunk commit (Step 7-C)</option>
+                        <option value="5" disabled>R5 — UNDO 폭주 (Step 7-C)</option>
+                        <option value="6" disabled>R6 — 멱등성 (Step 7-C)</option>
+                    </select>
+                </div>
+                <div class="alert alert-info">
+                    <strong>실행 흐름:</strong> 5만 contract 조회 → 전략별 INSERT → BL_BATCH_LOG 에 결과 기록.
+                    화면은 즉시 응답받고, 실제 작업은 batch 모듈 별 스레드에서 진행됩니다.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="BatchTrigger.runBillingCreate()">실행</button>
             </div>
         </div>
     </div>

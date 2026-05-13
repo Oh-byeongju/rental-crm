@@ -114,6 +114,15 @@ public class BatchLog extends BaseAuditEntity {
         else         this.failCount++;
     }
 
+    /** 대량 처리 — 매 건 addProcess 부담 회피. Step 7 측정에서 사용. */
+    public void setCounters(int processed, int success, int fail) {
+        this.processCount = processed;
+        this.successCount = success;
+        this.failCount    = fail;
+    }
+
+    public void markTargetCount(int target) { this.targetCount = target; }
+
     /** 배치 완료 처리 — 실행 시간 계산. */
     public void markCompleted() {
         this.batchStatus  = STATUS_COMPLETED;

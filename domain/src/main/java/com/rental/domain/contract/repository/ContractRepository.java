@@ -12,6 +12,13 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     boolean existsByContractNo(String contractNo);
 
     /**
+     * 활성 계약 전체. Ch.1 청구 배치 입력. 5만 건까지 메모리 1차 로드 OK (~25MB).
+     * 더 커지면 Pageable 또는 Stream 으로 전환 검토.
+     */
+    @Query("select c from Contract c where c.contractStatus = 'ACTIVE'")
+    java.util.List<Contract> findAllActive();
+
+    /**
      * 특정 장비를 사용하는 활성(ACTIVE) 계약 수.
      * 가용 수량 = 장비.STOCK_QTY − 이 카운트.
      * Native SQL — Contract↔Product 간 JPA 연관관계 매핑 없음.

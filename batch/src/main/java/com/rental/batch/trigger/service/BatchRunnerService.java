@@ -1,5 +1,7 @@
 package com.rental.batch.trigger.service;
 
+import com.rental.batch.billing.service.BillingCreateService;
+import com.rental.batch.trigger.dto.BatchRunRequest;
 import com.rental.domain.billing.entity.BatchLog;
 import com.rental.domain.billing.repository.BatchLogRepository;
 import com.rental.domain.common.audit.AuditContext;
@@ -11,10 +13,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 배치 실행기 (ADR-014 Step 5 — 통신 뼈대 검증용 더미).
+ * 배치 실행 dispatcher. {@code @Async} 로 별 스레드, REQUIRES_NEW 로 tx 분리.
  *
- * <p>Step 7 Ch.1 청구 배치 본 구현 시점에 시나리오별 Runner 로 분리될 가능성 있음.
- * 현재는 더미 2종 (DUMMY_SUCCESS / DUMMY_FAIL) 만 처리.
+ * <p>시나리오별 분기:
+ * <ul>
+ *   <li>{@code DUMMY_*} — 내부 처리 (Step 5)</li>
+ *   <li>{@code BILLING_CREATE} — {@link BillingCreateService#createMonthly} 위임 (Step 7)</li>
+ * </ul>
+ *
+ * <p>실패 처리 한계 (Step 7-B 시점):
+ * BILLING_CREATE 실패 시 같은 tx 안의 batchLog INSERT 도 rollback → 시도 흔적이 안 남음.
+ * Step 7-C 에서 marking service 분리 (REQUIRES_NEW) 검토.
  */
 @Slf4j
 @Service
@@ -22,39 +31,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class BatchRunnerService {
 
     private final BatchLogRepository batchLogRepository;
+    private final BillingCreateService billingCreateService;
 
-    /**
-     * 비동기 실행. caller 는 즉시 반환받고, 본 메서드가 별도 스레드에서 진행.
-     * <p>{@code @Async} 가 동작하려면 다른 빈에서 호출되어야 함 (self-invocation X).
-     * <p>{@code REQUIRES_NEW} — 호출 측 트랜잭션과 분리 (caller 는 트랜잭션 없음 / 별 스레드).
-     */
     @Async("batchTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void run(String batchType) {
-        // ThreadLocal AuditContext 는 @Async 스레드로 전파 안 됨 → SYSTEM 기본값 명시
+    public void run(String batchType, BatchRunRequest req) {
         AuditContext.set(AuditContext.AuditInfo.defaults());
         try {
-            var batchLog = batchLogRepository.save(
-                    BatchLog.builder().batchType(batchType).build()
-            );
-            batchLog.addProcess(true);   // dummy — 1건 처리한 것으로 가장
-
             switch (batchType) {
-                case BatchLog.TYPE_DUMMY_SUCCESS -> {
-                    sleep(500);
-                    batchLog.markCompleted();
-                }
-                case BatchLog.TYPE_DUMMY_FAIL -> {
-                    sleep(200);
-                    batchLog.markFailed("DUMMY_FAIL 시나리오 — 의도된 실패 (Step 5 검증)");
-                }
-                default -> batchLog.markFailed("unknown batchType: " + batchType);
+                case BatchLog.TYPE_DUMMY_SUCCESS, BatchLog.TYPE_DUMMY_FAIL ->
+                        runDummy(batchType);
+                case BatchLog.TYPE_BILLING_CREATE ->
+                        billingCreateService.createMonthly(req.billingMonth(), req.roundNo(), req.strategy());
+                default ->
+                        log.warn("[batch] unhandled batchType={}", batchType);
             }
-            log.info("[batch] {} done — status={} duration={}ms",
-                     batchType, batchLog.getBatchStatus(), batchLog.getDurationMs());
         } finally {
             AuditContext.clear();
         }
+    }
+
+    private void runDummy(String batchType) {
+        var batchLog = batchLogRepository.save(
+                BatchLog.builder().batchType(batchType).build()
+        );
+        batchLog.addProcess(true);
+
+        if (BatchLog.TYPE_DUMMY_SUCCESS.equals(batchType)) {
+            sleep(500);
+            batchLog.markCompleted();
+        } else {
+            sleep(200);
+            batchLog.markFailed("DUMMY_FAIL 시나리오 — 의도된 실패 (Step 5 검증)");
+        }
+        log.info("[batch] {} done — status={} duration={}ms",
+                 batchType, batchLog.getBatchStatus(), batchLog.getDurationMs());
     }
 
     private void sleep(long ms) {

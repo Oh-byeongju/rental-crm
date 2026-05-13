@@ -1,5 +1,6 @@
 package com.rental.backoffice.batch.service;
 
+import com.rental.backoffice.batch.dto.BatchTriggerRequest;
 import com.rental.domain.common.exception.BusinessException;
 import com.rental.domain.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +22,14 @@ public class BatchTriggerService {
 
     private final RestClient batchRestClient;
 
-    public void run(String scenario) {
+    public void run(String scenario, BatchTriggerRequest req) {
         try {
             Map<?, ?> body = batchRestClient.post()
                     .uri("/internal/batch/run/{scenario}", scenario)
+                    .body(req != null ? req : BatchTriggerRequest.empty())
                     .retrieve()
                     .body(Map.class);
-            log.info("[batch-trigger] scenario={} ack={}", scenario, body);
+            log.info("[batch-trigger] scenario={} req={} ack={}", scenario, req, body);
         } catch (RestClientException e) {
             log.error("[batch-trigger] scenario={} failed", scenario, e);
             throw new BusinessException(ErrorCode.EXTERNAL_SYSTEM_ERROR,
