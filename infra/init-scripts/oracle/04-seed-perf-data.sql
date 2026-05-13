@@ -88,34 +88,31 @@ COMMIT;
 -- ============================================================
 -- 4. CT_CONTRACT — 5만 행 (1만 customer × 평균 5 contract — round-robin)
 --
--- CUSTOMER_ID round-robin: customer_seed 의 시작 ID 모르므로 MIN+offset 사용.
--- PRODUCT_ID  round-robin: PR-PERF-* 5개에서 modulo 분배.
--- CONTRACT_NO 는 'CT-PERF-NNNNNN' 형식 (운영 자동 채번 'CT-YYYYMMDD-NNNNN' 과 prefix 로 구분).
+-- SEQ_CT_CUSTOMER INCREMENT BY 50 (Hibernate allocationSize=50 호환) → ID 비연속.
+-- 단순 MIN+offset 산술 X. ROW_NUMBER() inline view 로 0..N-1 인덱싱 → 실제 ID 매핑.
+-- CONTRACT_NO 'CT-PERF-NNNNNN' (운영 자동 채번 'CT-YYYYMMDD-NNNNN' 과 prefix 구분).
 -- ============================================================
 
-DECLARE
-    v_min_cust   NUMBER;
-    v_min_prod   NUMBER;
-BEGIN
-    SELECT MIN(CUSTOMER_ID) INTO v_min_cust FROM CT_CUSTOMER WHERE CUSTOMER_NO LIKE 'CUS-PERF-%';
-    SELECT MIN(PRODUCT_ID)  INTO v_min_prod FROM CT_PRODUCT  WHERE PRODUCT_CODE LIKE 'PR-PERF-%';
+INSERT INTO CT_CONTRACT (CONTRACT_ID, CONTRACT_NO, CUSTOMER_ID, PRODUCT_ID, MONTHLY_FEE, START_DATE, END_DATE, INSTALL_ADDRESS, CONTRACT_STATUS, FIRS_REG_PGM_ID, FIRS_REG_USER_ID, FIRS_REG_IP, FINA_REG_PGM_ID, FINA_REG_USER_ID, FINA_REG_IP)
+SELECT SEQ_CT_CONTRACT.NEXTVAL,
+       'CT-PERF-' || LPAD(gen.lvl, 6, '0'),
+       cust.CUSTOMER_ID,
+       prod.PRODUCT_ID,
+       30000 + MOD(gen.lvl, 70) * 1000,                       -- 30k~99k 분포
+       DATE '2024-01-01' + MOD(gen.lvl, 365),
+       DATE '2027-01-01' + MOD(gen.lvl, 365),                 -- 3년 + alpha
+       '서울시 측정구 PerfDong 설치주소 ' || gen.lvl,
+       'ACTIVE',
+       'SEED', 'SYSTEM', '127.0.0.1', 'SEED', 'SYSTEM', '127.0.0.1'
+  FROM (SELECT LEVEL AS lvl FROM DUAL CONNECT BY LEVEL <= 50000) gen
+  JOIN (SELECT CUSTOMER_ID, ROW_NUMBER() OVER (ORDER BY CUSTOMER_ID) - 1 AS rn
+          FROM CT_CUSTOMER WHERE CUSTOMER_NO LIKE 'CUS-PERF-%') cust
+    ON cust.rn = MOD(gen.lvl - 1, 10000)
+  JOIN (SELECT PRODUCT_ID, ROW_NUMBER() OVER (ORDER BY PRODUCT_ID) - 1 AS rn
+          FROM CT_PRODUCT WHERE PRODUCT_CODE LIKE 'PR-PERF-%') prod
+    ON prod.rn = MOD(gen.lvl - 1, 5);
 
-    INSERT INTO CT_CONTRACT (CONTRACT_ID, CONTRACT_NO, CUSTOMER_ID, PRODUCT_ID, MONTHLY_FEE, START_DATE, END_DATE, INSTALL_ADDRESS, CONTRACT_STATUS, FIRS_REG_PGM_ID, FIRS_REG_USER_ID, FIRS_REG_IP, FINA_REG_PGM_ID, FINA_REG_USER_ID, FINA_REG_IP)
-    SELECT SEQ_CT_CONTRACT.NEXTVAL,
-           'CT-PERF-' || LPAD(lvl, 6, '0'),
-           v_min_cust + MOD(lvl - 1, 10000),                      -- 0..9999 round-robin
-           v_min_prod + MOD(lvl - 1, 5),                          -- 0..4 round-robin (PR-PERF-* 5개)
-           30000 + MOD(lvl, 70) * 1000,                           -- 30k~99k 분포
-           DATE '2024-01-01' + MOD(lvl, 365),
-           DATE '2027-01-01' + MOD(lvl, 365),                     -- 3년 + alpha
-           '서울시 측정구 PerfDong 설치주소 ' || lvl,
-           'ACTIVE',
-           'SEED', 'SYSTEM', '127.0.0.1', 'SEED', 'SYSTEM', '127.0.0.1'
-      FROM (SELECT LEVEL AS lvl FROM DUAL CONNECT BY LEVEL <= 50000);
-
-    COMMIT;
-END;
-/
+COMMIT;
 
 -- ============================================================
 -- 5. 완료 보고

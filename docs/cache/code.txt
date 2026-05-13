@@ -98,10 +98,12 @@ PAYMENT_CREATE|수납 처리|901|CREATE|20|Y
 OVERDUE_VIEW|연체 조회|951|VIEW|10|Y
 OVERDUE_RELEASE|연체 수동해제|951|EXECUTE|20|Y
 BATCH_LOG_VIEW|배치 실행 이력 조회|1001|VIEW|10|Y
-OVERDUE_REPORT_VIEW|미납 현황 조회|1051|VIEW|10|Y
-OVERDUE_REPORT_EXPORT|미납 현황 엑셀|1051|EXECUTE|20|Y
-DASHBOARD_VIEW|대시보드 조회|1101|VIEW|10|Y
-NOTIFICATION_VIEW|알림 조회|1151|VIEW|10|Y
+BATCH_TRIGGER_VIEW|배치 실행 화면 조회|1051|VIEW|10|Y
+BATCH_TRIGGER_EXECUTE|배치 시나리오 실행|1051|EXECUTE|20|Y
+OVERDUE_REPORT_VIEW|미납 현황 조회|1101|VIEW|10|Y
+OVERDUE_REPORT_EXPORT|미납 현황 엑셀|1101|EXECUTE|20|Y
+DASHBOARD_VIEW|대시보드 조회|1151|VIEW|10|Y
+NOTIFICATION_VIEW|알림 조회|1201|VIEW|10|Y
 
 === MENUS ===
 MENU_ID|PARENT|DEPTH|MENU_NAME|MENU_TYPE|MENU_URL
@@ -112,15 +114,15 @@ MENU_ID|PARENT|DEPTH|MENU_NAME|MENU_TYPE|MENU_URL
 201||1|기사/방문|GROUP|
 251||1|청구/수납|GROUP|
 301||1|통계/리포트|GROUP|
-1101||1|대시보드|LEAF|/admin/dashboard
-1151||1|알림|LEAF|/admin/notifications
+1151||1|대시보드|LEAF|/admin/dashboard
+1201||1|알림|LEAF|/admin/notifications
 351|1|2|공통코드|LEAF|/admin/codes
 551|51|2|고객|LEAF|/admin/customers
 601|101|2|장비|LEAF|/admin/equipments
 701|151|2|계약|LEAF|/admin/contracts
 751|201|2|기사|LEAF|/admin/engineers
 851|251|2|청구|LEAF|/admin/billings
-1051|301|2|미납현황|LEAF|/admin/reports/overdue
+1101|301|2|미납현황|LEAF|/admin/reports/overdue
 401|1|2|메뉴관리|LEAF|/admin/menus
 651|101|2|상품|LEAF|/admin/products
 801|201|2|방문이력|LEAF|/admin/visits
@@ -129,3 +131,4 @@ MENU_ID|PARENT|DEPTH|MENU_NAME|MENU_TYPE|MENU_URL
 951|251|2|연체|LEAF|/admin/overdues
 501|1|2|관리자관리|LEAF|/admin/users
 1001|251|2|배치이력|LEAF|/admin/batches
+1051|251|2|배치실행|LEAF|/admin/batch-trigger
