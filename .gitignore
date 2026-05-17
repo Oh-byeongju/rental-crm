@@ -37,6 +37,7 @@ infra/redis-data/
 .claude/settings.local.json
 .claude/scratch/
 .claude/worktrees/
+.claude/scheduled_tasks.lock
 
 # ===== OS =====
 .DS_Store

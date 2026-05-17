@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('미납 현황')}"></head>
+<body>
+<div class="page">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="page-wrapper">
+        <header th:replace="~{fragments/topnav :: topnav}"></header>
+
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <div class="page-pretitle">통계/리포트</div>
+                        <h2 class="page-title">미납 현황</h2>
+                        <p class="text-secondary mt-1">
+                            미수납 청구 (미납 + 연체) — 고객·계약 조인. 엑셀은 조건 전체를 SXSSF 스트리밍 다운로드.
+                        </p>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <div class="btn-list">
+                            <button type="button" class="btn btn-default" onclick="ReportOverdue.downloadExcel()">
+                                <i class="ti ti-download me-1"></i> 엑셀 다운로드
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="container-xl">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="searchForm" class="row g-2 search-form" onsubmit="return ReportOverdue.search(event)">
+                            <div class="col-md-3">
+                                <label class="form-label">청구월</label>
+                                <input type="text" name="billingMonth" class="form-control"
+                                       placeholder="2026-06" pattern="^\d{4}-(0[1-9]|1[0-2])$">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상태</label>
+                                <select name="status" class="form-select">
+                                    <option value="">미수납 전체</option>
+                                    <option value="UNPAID">미납</option>
+                                    <option value="OVERDUE">연체</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">고객명</label>
+                                <input type="text" name="customerName" class="form-control"
+                                       placeholder="부분 일치">
+                            </div>
+                            <div class="col-md-3 d-flex justify-content-end align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-search me-1"></i> 조회
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="ReportOverdue.reset()">
+                                    <i class="ti ti-refresh me-1"></i> 초기화
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-grid">
+                    <div class="card-body">
+                        <div id="reportOverdueGrid" class="ag-theme-quartz"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: scripts}"></div>
+<script th:src="@{/js/report-overdue.js}"></script>
+</body>
+</html>

@@ -15,7 +15,7 @@
                         <div class="page-pretitle">청구/수납</div>
                         <h2 class="page-title">배치 실행</h2>
                         <p class="text-secondary mt-1">
-                            ADR-014 Step 5/7 — 통신 검증용 더미 + Ch.1 청구 배치 (R1/R2 가용, R3~R6 Step 7-C).
+                            ADR-014 Step 5/7 — 통신 검증용 더미 + Ch.1 청구 배치 (R1~R4 + R6 가용, R5 는 수동 UNDO 절차).
                         </p>
                     </div>
                     <div class="col-auto">
@@ -107,7 +107,7 @@
                     <input type="text" id="billingMonth" class="form-control"
                            placeholder="2026-01" value="2026-01"
                            pattern="^\d{4}-(0[1-9]|1[0-2])$">
-                    <small class="form-hint">라운드별 다른 month 권장 (UNIQUE 제약 회피).</small>
+                    <small class="form-hint">R1~R4 는 라운드별 다른 month 권장 (UNIQUE 회피). R6 은 반대로 기존 month 재사용 (멱등성 검증).</small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label required">라운드 번호 (1~6)</label>
@@ -116,8 +116,10 @@
                         <option value="2">R2 — chunk-flush (1000건마다 flush + clear)</option>
                         <option value="3">R3 — bulk-jdbc (JdbcTemplate batchUpdate, JPA 우회)</option>
                         <option value="4">R4 — chunk-commit (1000건 마다 REQUIRES_NEW tx commit)</option>
-                        <option value="5" disabled>R5 — UNDO 폭주 (Step 7-C)</option>
-                        <option value="6" disabled>R6 — 멱등성 (Step 7-C)</option>
+                        <option value="5" disabled>R5 — UNDO 폭주 (수동 UNDO 절차 — 측정 리포트 참조)</option>
+                        <option value="catch-continue">R6-A — 멱등성: catch+continue (단건 INSERT, 위반 잡고 계속)</option>
+                        <option value="select-insert">R6-B — 멱등성: SELECT 후 INSERT (per-row 존재 가드)</option>
+                        <option value="merge">R6-C — 멱등성: Oracle MERGE INTO (DB 위임)</option>
                     </select>
                 </div>
                 <div class="alert alert-info">

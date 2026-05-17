@@ -18,6 +18,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     @Query("select c from Contract c where c.contractStatus = 'ACTIVE'")
     java.util.List<Contract> findAllActive();
 
+    /** 대시보드 집계 — 상태별 계약 수 (전체 활성 계약 위젯). */
+    long countByContractStatus(String contractStatus);
+
     /**
      * 특정 장비를 사용하는 활성(ACTIVE) 계약 수.
      * 가용 수량 = 장비.STOCK_QTY − 이 카운트.

@@ -26,6 +26,18 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     long countActiveByBillingId(@Param("billingId") Long billingId);
 
     /**
+     * 대시보드 집계 (04 §9) — 이번 달 수납액.
+     * 수납일이 [start, end] 범위 + COMPLETED. coalesce 로 0 보장.
+     */
+    @Query("""
+        select coalesce(sum(p.paymentAmount), 0) from Payment p
+         where p.paymentStatus = 'COMPLETED'
+           and p.paymentDate between :start and :end
+        """)
+    long sumCompletedAmountBetween(@Param("start") LocalDate start,
+                                   @Param("end")   LocalDate end);
+
+    /**
      * 검색 페이징.
      * 인덱스 활용:
      *  - IDX_BL_PAYMENT_BILLING (BILLING_ID, PAYMENT_STATUS) — 청구별 수납 조회

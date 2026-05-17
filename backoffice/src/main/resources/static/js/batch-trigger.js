@@ -16,17 +16,25 @@ const BatchTrigger = (() => {
 
     async function runBillingCreate() {
         const billingMonth = document.getElementById('billingMonth').value.trim();
-        const roundNo = parseInt(document.getElementById('roundNo').value, 10);
+        const raw = document.getElementById('roundNo').value;
 
         if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(billingMonth)) {
             App.toast('청구월 형식 오류 (YYYY-MM)', 'error');
             return;
         }
-        const strategy = roundNo === 1 ? 'single-save'
-                       : roundNo === 2 ? 'chunk-flush'
-                       : roundNo === 3 ? 'bulk-jdbc'
-                       : roundNo === 4 ? 'chunk-commit'
-                       : null;
+        // R1~R4 = 숫자 value (roundNo). R6 = 전략명 value (catch-continue/select-insert/merge).
+        let roundNo, strategy;
+        if (/^\d+$/.test(raw)) {
+            roundNo = parseInt(raw, 10);
+            strategy = roundNo === 1 ? 'single-save'
+                     : roundNo === 2 ? 'chunk-flush'
+                     : roundNo === 3 ? 'bulk-jdbc'
+                     : roundNo === 4 ? 'chunk-commit'
+                     : null;
+        } else {
+            roundNo = 6;
+            strategy = raw;
+        }
         if (!strategy) { App.toast('해당 라운드는 Step 7-C 에서 지원', 'error'); return; }
 
         if (!confirm(`BILLING_CREATE 를 실행합니다.\n월=${billingMonth}, R${roundNo} (${strategy})\n5만건 INSERT — 수~수십초 소요.`)) return;

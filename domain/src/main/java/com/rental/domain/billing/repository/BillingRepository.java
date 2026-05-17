@@ -13,6 +13,18 @@ public interface BillingRepository extends JpaRepository<Billing, Long> {
 
     boolean existsByContractIdAndBillingMonth(Long contractId, String billingMonth);
 
+    // ===== 대시보드 집계 (04 §9) =====
+
+    /** 이번 달 청구 수 — BILLING_MONTH = 현재월. */
+    long countByBillingMonth(String billingMonth);
+
+    /** 미납 수 — BILLING_STATUS IN (UNPAID, OVERDUE). */
+    long countByBillingStatusIn(java.util.Collection<String> statuses);
+
+    /** 미납 금액 합계 — 동일 조건. coalesce 로 0 보장(null 방지). */
+    @Query("select coalesce(sum(b.billingAmount), 0) from Billing b where b.billingStatus in :statuses")
+    long sumAmountByBillingStatusIn(@Param("statuses") java.util.Collection<String> statuses);
+
     /**
      * 연체 대상 조회 — UNPAID + DUE_DATE 지남.
      * `IDX_BL_BILLING_STATUS_DUE (BILLING_STATUS, DUE_DATE)` 활용. Ch.1 OVERDUE_UPDATE 배치에서 사용.

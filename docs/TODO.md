@@ -24,15 +24,15 @@
 ### 1-2. 배치 학습 본체 (Step 6~10)
 
 - [x] **Step 6** — 배치 시나리오 정의 (`docs/100_배치 시나리오 정의.md` — 7 시나리오 + Ch.1 6 라운드 계획)
-- [ ] **Step 7** — **Ch.1 청구 배치 6 라운드 측정** (본 학습 본체 — bulk INSERT / chunk commit / UNDO / 메모리 / 재시작)
+- [x] **Step 7** — **Ch.1 청구 배치 6 라운드 측정 완료** (R1~R6 실측 — bulk INSERT / chunk commit / UNDO / 멱등성). 순수 성능 R1~R4, UNDO R5, 멱등성 R6.
   - [x] **7-A** — 결정 + 시드 (`04-seed-perf-data.sql`) + DDL 갱신 (CHECK 제거, ROUND_NO/BATCH_PARAMS 추가). Step 5 CHECK 위반 발견·수정.
   - [x] **7-B 코드** — Strategy 패턴 (`BillingInsertStrategy` interface + `SingleSaveStrategy` R1 + `ChunkFlushClearStrategy` R2) + `BillingCreateService` (5만 contract 로드 → 전략 실행) + batch runner 분기 + 화면 BILLING_CREATE 카드/모달 (month/round 입력)
   - [x] **7-B 측정** — Docker 재기동 + 시드 + bootRun + 실 호출 → **R1 6,482ms / R2 21,543ms** (R2 가 R1 의 3.3배). 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-vs-r2.md`](perf-reports/2026-05-13-billing-create-r1-vs-r2.md). **버그 발견**: `em.clear()` 가 batchLog 도 detach → R2 STATUS 미갱신 (BL_BILLING 5만 행은 정상 INSERT).
   - [x] **7-C-1** — 버그 fix (saveAndFlush + findById reload) + R3 측정 (bulk-jdbc 16,222 ms). **R3 가 R1 보다 느린 의외 결과** — SEQ.NEXTVAL NOCACHE + INCREMENT_BY=50 호출 횟수 50배 차이. 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-r2-r3.md`](perf-reports/2026-05-13-billing-create-r1-r2-r3.md)
   - [x] **7-C-2** — 대규모 리팩터 (`BatchLogManager` REQUIRES_NEW + R1~R3 strategy 자체 tx) + R4 chunk-commit 측정 (27,876 ms). **R4 가 가장 느림** — LGWR 50회 commit 비용. 학습: chunk commit 의 진짜 가치는 성능 X, R5 UNDO 폭주에서 진가. 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md`](perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md)
-  - [ ] **7-C-3** — R5 UNDO 폭주 + R6 멱등성 ← **다음 세션 시작 지점**. R5 인프라 조사·설계 완료 (2026-05-17) → [`docs/perf-reports/2026-05-17-r5-undo-setup.md`](perf-reports/2026-05-17-r5-undo-setup.md) — "5MB 고정" 폐기, **R1 ORA-30036 트리거 / R4 통과 UNDO 임계 탐색** 으로 재정의. R6 = UNIQUE 위반 3안 (catch+continue / SELECT 후 INSERT / MERGE)
-- [ ] **Step 8** — UNDO 폭주 재현 환경 (Docker oracle 작은 UNDO tablespace 강제)
-- [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습)
+  - [x] **7-C-3** — R5 UNDO 폭주 + R6 멱등성 **완료** (2026-05-17). R5: single-save ORA-30036 FAILED + 거짓 COMPLETED 버그 수정 ([`r5-undo`](perf-reports/2026-05-17-billing-create-r5-undo.md)). R6: 3안 모두 멱등 정확, **MERGE 가 catch-continue/select-insert 대비 ~33배** (8.9s vs 296·306s) — 비용은 충돌 처리 방식이 아니라 라운드트립 수 ([`r6-idempotency`](perf-reports/2026-05-17-billing-create-r6-idempotency.md)). 잔여 탐색(R5 §4 "R1 실패/R4 통과 UNDO 임계", 절대값 clean 재측정)은 99 §다음 작업에 보존.
+- [x] **Step 8** — UNDO 폭주 재현 환경 — R5(7-C-3)가 `undo_small` 2M 로 ORA-30036 이미 재현. 별도 환경 작업 불요 (잔여 임계 탐색은 99 §다음 작업 선택 항목).
+- [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습) ← **다음 주 학습 본체**
 - [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계)
 
 ---
@@ -60,12 +60,12 @@
 
 ### 2-3. 학습 핵심 — Ch.2 (Ch.1/Ch.3 은 NOW Step 7/9 로 이동)
 
-- [ ] **Ch.2 통계 미납 엑셀** — 쿼리 튜닝 (서브쿼리 → JOIN + 인덱스 활용) + Oracle EXPLAIN PLAN 전/후 비교 + Apache POI SXSSF 스트리밍. 배치 모듈 학습 본체 (NOW Step 7~9) 후 진행.
+- [x] **Ch.2 통계 미납 엑셀 완료** (2026-05-17) — `/admin/reports/overdue` 풀스택. 스칼라 서브쿼리 vs JOIN: EXPLAIN cost **137×** / 실제 buffer gets **44×** + 스칼라 서브쿼리 캐싱·FK join elimination 학습. SXSSF 스트리밍 5만행 검증. 리포트 [`overdue-report-query-tuning`](perf-reports/2026-05-17-overdue-report-query-tuning.md). 잔여(청구현황/월수납통계)는 학습 본체 아님 — 99 §다음 작업 선택.
 
 ### 2-4. 대시보드 + 알림
 
-- [ ] 대시보드 — `@Scheduled` 집계 + Redis 캐시 (미납/연체/매출 위젯)
-- [ ] 알림 목록 화면 (`CM_NOTIFICATION` 조회)
+- [x] **대시보드 완료** (2026-05-17) — `GET /api/dashboard/summary` 5위젯 + Redis cache-aside(TTL 5분) + `@Scheduled` 워밍 + 서버측 렌더. MISS 2.1s→HIT 0.19s(~11×) 검증. 차트 2개는 §13-3 월별수납 리포트 의존 → 선택 후속.
+- [x] **알림 목록 화면 완료** — `/admin/notifications` (3회차 구현분, 문서 드리프트 정정).
 
 ---
 
