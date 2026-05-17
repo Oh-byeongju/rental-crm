@@ -1,4 +1,4 @@
-# rental-crm
+﻿# rental-crm
 
 > 장비 렌탈 청구 관리 시스템 — 백오피스 ERP + 고객 포털.
 > SI 실무 경험(JDK 마이그레이션, SAP EAI, 대량 처리 배치)을 직접 재현하며 **대량 데이터 처리 / 쿼리 튜닝 / Kafka 이벤트 파이프라인** 을 학습.
@@ -82,7 +82,7 @@ graph TB
 rental-crm/
 ├── .claude/rules/             # Claude 헌법 (메타룰 + 식별자 매핑)
 ├── docs/                      # 산출물 (01~99 .md) + ADR + 룰 + 도메인 용어집
-│   ├── 01. 업무기획서.md ~ 08. 배포 가이드.md
+│   ├── 01_업무기획서.md ~ 08_배포 가이드.md
 │   ├── decisions/             # ADR-001 ~ 007
 │   ├── global-rules/          # 전역 룰 (DB 컨벤션, 그리드 라이브러리)
 │   └── domain-terms/          # 도메인 용어집 (접미어/한↔영)

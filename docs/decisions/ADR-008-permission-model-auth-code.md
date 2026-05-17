@@ -1,12 +1,12 @@
-# ADR-008 — 권한 모델: 메뉴 R/W/D 폐기, AUTH 키 단위 채택
+﻿# ADR-008 — 권한 모델: 메뉴 R/W/D 폐기, AUTH 키 단위 채택
 
 - **작성일**: 2026-05-11
 - **상태**: 확정
 - **연관**:
   - `docs/decisions/ADR-001-erd-cm-block-revision.md` (선결정 — 후속 보강)
-  - `docs/06. ERD 및 테이블 정의서.md` §CM 블록 갱신
-  - `docs/04. 기능 명세서.md` §1-3 권한 관리 UX 갱신
-  - `docs/07. API 명세서.md` §4 권한/메뉴 API 갱신
+  - `docs/06_ERD 및 테이블 정의서.md` §CM 블록 갱신
+  - `docs/04_기능 명세서.md` §1-3 권한 관리 UX 갱신
+  - `docs/07_API 명세서.md` §4 권한/메뉴 API 갱신
   - `infra/init-scripts/oracle/01-create-schema.sql` DDL 갱신
   - `infra/init-scripts/oracle/02-create-indexes.sql` 인덱스 갱신
 

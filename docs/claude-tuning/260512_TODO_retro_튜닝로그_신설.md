@@ -1,4 +1,4 @@
-# 260512 — TODO / retro / claude-tuning 폴더 신설
+﻿# 260512 — TODO / retro / claude-tuning 폴더 신설
 
 태그: `tooling`
 
@@ -35,7 +35,7 @@ ref-project 도구를 **풀세트가 아니라 점진적 도입**.
 1. `docs/TODO.md` 신설 — NOW/NEXT/LATER 3단. 2차/3차 작업도 LATER 에 미리 명시.
 2. `docs/retro/README.md` 신설 — 회고 디렉토리 안내. `YYMMDD_주제.md` 파일명 규칙.
 3. `docs/claude-tuning/README.md` 신설 — 본 폴더 자체. 동일 규칙.
-4. `docs/99. 업무현황.md` — "다음 세션 할 일" 섹션을 TODO.md 참조로 단순화. 99 는 *완료 보고용*, TODO 는 *작업 예정 추적용*.
+4. `docs/99_업무현황.md` — "다음 세션 할 일" 섹션을 TODO.md 참조로 단순화. 99 는 *완료 보고용*, TODO 는 *작업 예정 추적용*.
 
 ## 역할 분담
 

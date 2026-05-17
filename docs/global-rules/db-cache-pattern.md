@@ -1,4 +1,4 @@
----
+﻿---
 description: "DB 스키마/시드 조회 시 — docs/cache/ 텍스트 캐시 우선 (DB 직접 조회 금지)"
 ---
 
@@ -18,7 +18,7 @@ Claude 가 다음 정보를 필요로 할 때:
 ## 우선순위
 
 1. **`docs/cache/{table,code}.txt` 부터 grep** — 가장 빠름. context 토큰 절감.
-2. 캐시에 없는 정보 → ERD 문서 (`docs/06. ERD 및 테이블 정의서.md`) Read
+2. 캐시에 없는 정보 → ERD 문서 (`docs/06_ERD 및 테이블 정의서.md`) Read
 3. ERD 에도 없는 디테일 → DDL 파일 (`infra/init-scripts/oracle/01-create-schema.sql`) Read
 4. **DB 에 직접 조회 / `refresh.py` 자동 실행 금지** — 사용자 명시 호출 (`/cache-refresh`) 만 캐시 갱신
 

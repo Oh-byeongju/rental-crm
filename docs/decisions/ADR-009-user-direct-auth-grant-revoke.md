@@ -1,12 +1,12 @@
-# ADR-009 — 사용자 직접 권한 매핑 (역할 폭증 회피)
+﻿# ADR-009 — 사용자 직접 권한 매핑 (역할 폭증 회피)
 
 - **작성일**: 2026-05-11
 - **상태**: 확정
 - **연관**:
   - `docs/decisions/ADR-008-permission-model-auth-code.md` (선결정 — 사용자 단위까지 확장)
-  - `docs/06. ERD 및 테이블 정의서.md` §CM 블록 갱신 (테이블 19개)
-  - `docs/04. 기능 명세서.md` §1-2 관리자 계정 관리 UX 확장
-  - `docs/07. API 명세서.md` §3 관리자 관련 API 확장
+  - `docs/06_ERD 및 테이블 정의서.md` §CM 블록 갱신 (테이블 19개)
+  - `docs/04_기능 명세서.md` §1-2 관리자 계정 관리 UX 확장
+  - `docs/07_API 명세서.md` §3 관리자 관련 API 확장
   - `infra/init-scripts/oracle/01-create-schema.sql` DDL 갱신
   - `infra/init-scripts/oracle/02-create-indexes.sql` 인덱스 갱신
 

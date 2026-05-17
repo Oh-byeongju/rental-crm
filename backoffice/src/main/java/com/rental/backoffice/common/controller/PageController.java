@@ -19,23 +19,9 @@ public class PageController {
 
     /** 시드 메뉴 URL → 표시명. 도메인 Controller 가 추가되면 본 맵에서 제거. */
     private static final Map<String, String> PLACEHOLDER_MENUS = new LinkedHashMap<>() {{
-        // 장비/상품
-        put("/admin/equipments",      "장비 관리");
-        put("/admin/products",        "상품 관리");
-        // 계약
-        put("/admin/contracts",       "계약 관리");
-        // 기사/방문
-        put("/admin/engineers",       "기사 관리");
-        put("/admin/visits",          "방문 이력");
-        // 청구/수납
-        put("/admin/billings",        "청구 관리");
-        put("/admin/payments",        "수납 관리");
-        put("/admin/overdues",        "연체 관리");
-        put("/admin/batches",         "배치 실행 이력");
-        // 통계/리포트
+        // 전용 PageController 가 아직 없는 미구현 경로만 placeholder 로 남긴다.
+        // 도메인 Controller 가 추가되면 본 맵 + 아래 @GetMapping 에서 제거.
         put("/admin/reports/overdue", "미납 현황 엑셀");
-        // 알림
-        put("/admin/notifications",   "알림 내역");
     }};
 
     /** 루트 + 사이드바의 "대시보드" 메뉴 모두 dashboard.html 반환. */
@@ -55,19 +41,7 @@ public class PageController {
      * 미구현 도메인 일괄 placeholder — 시드 메뉴 (`/admin/*`) 와 1:1 매칭.
      * 도메인 Controller 가 구현되면 본 클래스의 PLACEHOLDER_MENUS + GetMapping 에서 제거.
      */
-    @GetMapping({
-            "/admin/equipments",
-            "/admin/products",
-            "/admin/contracts",
-            "/admin/engineers",
-            "/admin/visits",
-            "/admin/billings",
-            "/admin/payments",
-            "/admin/overdues",
-            "/admin/batches",
-            "/admin/reports/overdue",
-            "/admin/notifications"
-    })
+    @GetMapping("/admin/reports/overdue")
     public String placeholder(HttpServletRequest req, Model model) {
         var path = req.getRequestURI();
         model.addAttribute("requestPath", path);

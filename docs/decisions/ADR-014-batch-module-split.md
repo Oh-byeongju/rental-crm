@@ -1,4 +1,4 @@
-# ADR-014 — 배치 모듈 분리 (rental-batch)
+﻿# ADR-014 — 배치 모듈 분리 (rental-batch)
 
 상태: **Accepted** (2026-05-13)
 영향 범위: 모노레포 디렉토리 구조 / Gradle 빌드 / 패키지 루트 / 포트 매핑 / Phase 1 학습 시나리오
@@ -129,7 +129,7 @@ rental-crm/
 | 패키지 | `com.rental.crm.*` (전 클래스) → `com.rental.{backoffice,batch,domain}.*` |
 | Gradle | 단일 → 멀티 모듈 (`settings.gradle` + 4 `build.gradle`) |
 | 룰 | `backend/guide/` → `backoffice/guide/`, `batch/guide/` 신설 |
-| 문서 | `TODO.md` / `99. 업무현황.md` / `.claude/rules/project/general/system-info.md` / `.claude/rules/project/README.md` / `CLAUDE.md` |
+| 문서 | `TODO.md` / `99_업무현황.md` / `.claude/rules/project/general/system-info.md` / `.claude/rules/project/README.md` / `CLAUDE.md` |
 | 포트 | 9093 신규 (`infra/.env` 또는 batch `application.yml`) |
 | 빌드 명령 | `./gradlew :backoffice:bootRun` / `:batch:bootRun` |
 

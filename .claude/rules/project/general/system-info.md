@@ -1,4 +1,4 @@
-# 시스템 정보 — rental-crm
+﻿# 시스템 정보 — rental-crm
 
 > 빌드 명령·기술 스택·아키텍처·환경 프로파일. **매 세션 자동 로드**.
 
@@ -35,7 +35,7 @@
 rental-crm/
 ├── .claude/rules/                  ← 헌법 (자동 로드)
 ├── docs/                           ← 설계 산출물 + 전역 룰
-│   ├── 01~99. *.md                 ← 산출물
+│   ├── 01~100_*.md                 ← 산출물
 │   ├── decisions/                  ← 전역 ADR
 │   ├── notes/
 │   └── global-rules/               ← 전역 작업 시점 룰
@@ -122,8 +122,8 @@ npm run dev
 | 모노레포 | 풀스택 변경 PR 한 번에 묶기 | - |
 | 백오피스 + API = 단일 Spring Boot 앱 | 도메인 코드 공유, 멀티모듈 오버엔지니어링 회피 | - |
 | 인프라 docker-compose 별도 | 앱 재빌드와 DB 라이프사이클 분리 | `infra/docker-compose.yml` |
-| JPA 선택 (MyBatis 아님) | 객체 중심 ORM 학습 + 벌크 연산 패턴 학습 | `docs/03. 기술 스택 정의서.md` |
-| `BL_BILLING.CUSTOMER_ID` 역정규화 | 청구 조회 시 JOIN 비용 절감 | `docs/06. ERD 및 테이블 정의서.md` |
+| JPA 선택 (MyBatis 아님) | 객체 중심 ORM 학습 + 벌크 연산 패턴 학습 | `docs/03_기술 스택 정의서.md` |
+| `BL_BILLING.CUSTOMER_ID` 역정규화 | 청구 조회 시 JOIN 비용 절감 | `docs/06_ERD 및 테이블 정의서.md` |
 
 ---
 

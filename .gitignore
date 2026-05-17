@@ -36,6 +36,7 @@ infra/redis-data/
 # ===== Claude personal settings =====
 .claude/settings.local.json
 .claude/scratch/
+.claude/worktrees/
 
 # ===== OS =====
 .DS_Store

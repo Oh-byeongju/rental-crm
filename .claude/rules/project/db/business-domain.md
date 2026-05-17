@@ -1,4 +1,4 @@
----
+﻿---
 description: "신규 테이블 / 시퀀스 / 인덱스 설계 시 — 업무 도메인 prefix → 의미 매핑"
 ---
 
@@ -35,7 +35,7 @@ description: "신규 테이블 / 시퀀스 / 인덱스 설계 시 — 업무 도
 
 1. 사용자에게 prefix 후보 (2글자 대문자) 확인
 2. 본 표에 행 추가
-3. ERD 정의서 [`docs/06. ERD 및 테이블 정의서.md`](../../../../docs/06.%20ERD%20및%20테이블%20정의서.md) §명명 규칙 갱신
+3. ERD 정의서 [`docs/06_ERD 및 테이블 정의서.md`](../../../../docs/06_ERD%20및%20테이블%20정의서.md) §명명 규칙 갱신
 4. 시스템 정보 [`@.claude/rules/project/general/system-info.md`](../general/system-info.md) 테이블 접두사 줄 갱신
 5. 매핑 표 [`@.claude/rules/project/README.md`](../README.md) 갱신
 
@@ -43,7 +43,7 @@ description: "신규 테이블 / 시퀀스 / 인덱스 설계 시 — 업무 도
 
 ## 관련 룰
 
-- ERD / 테이블 정의: [`docs/06. ERD 및 테이블 정의서.md`](../../../../docs/06.%20ERD%20및%20테이블%20정의서.md)
+- ERD / 테이블 정의: [`docs/06_ERD 및 테이블 정의서.md`](../../../../docs/06_ERD%20및%20테이블%20정의서.md)
 - DB 컨벤션: [`docs/global-rules/db-conventions.md`](../../../../docs/global-rules/db-conventions.md)
 - SQL 작성: [`@.claude/rules/frame/db/sql-query.md`](../../frame/db/sql-query.md)
 - 시스템 정보 (스택·환경): [`@.claude/rules/project/general/system-info.md`](../general/system-info.md)
