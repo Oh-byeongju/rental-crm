@@ -33,7 +33,10 @@
   - [x] **7-C-3** — R5 UNDO 폭주 + R6 멱등성 **완료** (2026-05-17). R5: single-save ORA-30036 FAILED + 거짓 COMPLETED 버그 수정 ([`r5-undo`](perf-reports/2026-05-17-billing-create-r5-undo.md)). R6: 3안 모두 멱등 정확, **MERGE 가 catch-continue/select-insert 대비 ~33배** (8.9s vs 296·306s) — 비용은 충돌 처리 방식이 아니라 라운드트립 수 ([`r6-idempotency`](perf-reports/2026-05-17-billing-create-r6-idempotency.md)). 잔여 탐색(R5 §4 "R1 실패/R4 통과 UNDO 임계", 절대값 clean 재측정)은 99 §다음 작업에 보존.
 - [x] **Step 8** — UNDO 폭주 재현 환경 — R5(7-C-3)가 `undo_small` 2M 로 ORA-30036 이미 재현. 별도 환경 작업 불요 (잔여 임계 탐색은 99 §다음 작업 선택 항목).
 - [x] **Step 9** — **Ch.3 Kafka 이벤트 드리븐 도입 완료** (2026-05-17, [ADR-015](decisions/ADR-015-kafka-event-driven-introduction.md)). 04 §0-3 권위 스펙 구현 — 3흐름: `payment.completed`(backoffice AFTER_COMMIT producer→연체 자동해제+알림) / `billing.created`(**batch** producer→backoffice 알림, 교차모듈/양방향) / `visit.assigned`(코드완성, 활성기사 시드 0 → 런타임 보류). 멱등=**자연 멱등 신규 DDL 0** (existsBy 가드 + no-op-on-repeat, 메시지 key=멱등키 동일파티션 직렬) / offset=manual ack 성공후. 신규 전역룰 [`kafka-event-contract.md`](global-rules/kafka-event-contract.md). **런타임 검증**: 수납등록→pub(key=151002)/con→알림1+billing PAID; 배치 더블 트리거→billing.created 2회 수신·**알림 BILLING_CREATED 1건 불변**(멱등 skip). `payment.overdue`(OVERDUE_UPDATE 배치 미구현)·`payment.cancelled`(04 §0-3 외)·outbox·DLT = LATER. 리포트 불요(측정 챕터 아님).
-- [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계) ← **다음 학습 본체**
+- [ ] **Step 10** — 도메인별 배치 메뉴 확장 ← **다음 학습 본체**
+  - [x] **10-① ENERGY_CUSTOMER_SYNC 완료** (2026-05-18) — 외부 CSV → `CT_CUSTOMER` 멱등 Oracle MERGE upsert(`CUSTOMER_NO=ENG-{extId}`) + 행별검증 실패분리(`FAIL_COUNT`+`ERROR_MSG`, 부분실패도 COMPLETED) + `@Scheduled`(새벽)+수동. R6-C MergeStrategy 패턴 차용(insert-only→full upsert), 신규 DDL 0. 런타임: RUN1 `8/6/2`(2 invalid=빈name/빈extId), RUN2 재트리거 → ENG-* 6 불변(멱등). docs/100 §5-3.
+  - [ ] **10-② ACCOUNTING_REFRESH** — 1분 주기 polling→Redis. `@Scheduled` fixedDelay vs fixedRate overlap skip / cache evict. ShedLock 은 단일 인스턴스 학습앱엔 과임 → LATER 문서화.
+  - [ ] **10-③ STAT_AGGREGATE_DAILY** — 자정 일/주/월 집계(GROUP BY/ROLLUP)→Redis. 대시보드 차트 2개 placeholder 연동 가능.
 
 ---
 

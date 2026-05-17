@@ -34,6 +34,8 @@ public class BatchLog extends BaseAuditEntity {
 
     public static final String TYPE_BILLING_CREATE = "BILLING_CREATE";
     public static final String TYPE_OVERDUE_UPDATE = "OVERDUE_UPDATE";
+    /** Step 10 — 외부(가상) 에너지사 고객 CSV 동기 (bulk MERGE + 실패행 분리). */
+    public static final String TYPE_ENERGY_CUSTOMER_SYNC = "ENERGY_CUSTOMER_SYNC";
     /** ADR-014 Step 5 — 통신 뼈대 검증용 더미. Step 7 실 시나리오 도입 시 제거 후보. */
     public static final String TYPE_DUMMY_SUCCESS  = "DUMMY_SUCCESS";
     public static final String TYPE_DUMMY_FAIL     = "DUMMY_FAIL";
@@ -129,6 +131,9 @@ public class BatchLog extends BaseAuditEntity {
         this.completedAt  = LocalDateTime.now();
         this.durationMs   = java.time.Duration.between(this.startedAt, this.completedAt).toMillis();
     }
+
+    /** 부분 실패 다이제스트 — COMPLETED 라도 FAIL_COUNT&gt;0 시 실패행 사유 기록 (DLQ식). */
+    public void recordErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
 
     public void markFailed(String errorMsg) {
         this.batchStatus  = STATUS_FAILED;

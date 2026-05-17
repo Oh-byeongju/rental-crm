@@ -26,7 +26,8 @@ public class BatchTriggerController {
     private static final Set<String> ALLOWED = Set.of(
             BatchLog.TYPE_DUMMY_SUCCESS,
             BatchLog.TYPE_DUMMY_FAIL,
-            BatchLog.TYPE_BILLING_CREATE
+            BatchLog.TYPE_BILLING_CREATE,
+            BatchLog.TYPE_ENERGY_CUSTOMER_SYNC
     );
 
     private final BatchRunnerService runner;

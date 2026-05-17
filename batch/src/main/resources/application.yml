@@ -65,6 +65,9 @@ app:
   internal:
     batch:
       token: ${BATCH_INTERNAL_TOKEN:dev-secret-change-me}
+  # ===== Step 10 ENERGY_CUSTOMER_SYNC — 외부(가상) CSV 경로 (classpath: 또는 file:) =====
+  energy:
+    csv-path: ${ENERGY_CSV_PATH:classpath:energy/energy-customers-sample.csv}
 
 # ===== Logging =====
 logging:

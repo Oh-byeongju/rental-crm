@@ -50,6 +50,15 @@ public class BatchLogManager {
         batchLog.markCompleted();
     }
 
+    /** 부분 실패 허용 배치 (ENERGY_CUSTOMER_SYNC 등) — COMPLETED + FAIL_COUNT + 실패행 다이제스트. */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void completeWithErrors(Long batchLogId, int processed, int success, int fail, String errorMsg) {
+        var batchLog = batchLogRepository.findById(batchLogId).orElseThrow();
+        batchLog.setCounters(processed, success, fail);
+        batchLog.recordErrorMsg(errorMsg);
+        batchLog.markCompleted();
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void fail(Long batchLogId, String errorMsg) {
         var batchLog = batchLogRepository.findById(batchLogId).orElseThrow();

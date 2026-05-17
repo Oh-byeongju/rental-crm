@@ -88,6 +88,30 @@
                     </div>
                 </div>
 
+                <!-- Step 10 외부 동기 -->
+                <h3 class="text-secondary mb-2 mt-4">외부 동기 (Step 10)</h3>
+                <div class="row row-cards">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">
+                                    <i class="ti ti-cloud-download text-azure me-1"></i>
+                                    ENERGY_CUSTOMER_SYNC
+                                </h3>
+                                <p class="text-secondary">
+                                    외부(가상) 에너지사 고객 CSV → <code>CT_CUSTOMER</code> 멱등 MERGE (upsert).
+                                    실패행은 <code>BL_BATCH_LOG.FAIL_COUNT</code> + <code>ERROR_MSG</code> 분리 기록.
+                                    매일 새벽 04:00 자동 + 수동.
+                                </p>
+                                <button type="button" class="btn btn-azure w-100"
+                                        onclick="BatchTrigger.runSimple('ENERGY_CUSTOMER_SYNC')">
+                                    <i class="ti ti-player-play me-1"></i> 수동 실행
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

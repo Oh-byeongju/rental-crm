@@ -14,6 +14,17 @@ const BatchTrigger = (() => {
         }
     }
 
+    // 파라미터 없는 시나리오 공용 트리거 (ENERGY_CUSTOMER_SYNC 등). 결과는 BL_BATCH_LOG 확인.
+    async function runSimple(scenario) {
+        if (!confirm(`'${scenario}' 를 실행하시겠습니까?\n결과는 실행 이력(BL_BATCH_LOG)에서 확인하세요.`)) return;
+        try {
+            const res = await App.post(`/api/admin/batch-trigger/run/${scenario}`, {});
+            App.toast(res.message || '요청 전송됨', 'success');
+        } catch (e) {
+            App.toast(e.message || '실행 실패', 'error');
+        }
+    }
+
     async function runBillingCreate() {
         const billingMonth = document.getElementById('billingMonth').value.trim();
         const raw = document.getElementById('roundNo').value;
@@ -50,5 +61,5 @@ const BatchTrigger = (() => {
         }
     }
 
-    return { runDummy, runBillingCreate };
+    return { runDummy, runSimple, runBillingCreate };
 })();

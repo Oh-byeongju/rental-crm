@@ -1,0 +1,9 @@
+externalId,name,email,phone,address
+E1001,김에너지,e1001@energy.example,01011110001,서울시 강남구 1
+E1002,이가스,e1002@energy.example,01011110002,서울시 서초구 2
+E1003,박전기,e1003@energy.example,01011110003,부산시 해운대구 3
+E1004,최수도,e1004@energy.example,01011110004,대구시 중구 4
+E1005,정도시,e1005@energy.example,01011110005,인천시 남동구 5
+E1006,한열,e1006@energy.example,01011110006,광주시 서구 6
+E1007,,e1007@energy.example,01011110007,대전시 유성구 7
+,누락키,e9999@energy.example,01011119999,세종시 8

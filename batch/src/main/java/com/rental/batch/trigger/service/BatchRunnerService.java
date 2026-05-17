@@ -1,6 +1,7 @@
 package com.rental.batch.trigger.service;
 
 import com.rental.batch.billing.service.BillingCreateService;
+import com.rental.batch.energy.service.EnergyCustomerSyncService;
 import com.rental.batch.trigger.dto.BatchRunRequest;
 import com.rental.domain.billing.entity.BatchLog;
 import com.rental.domain.common.audit.AuditContext;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 public class BatchRunnerService {
 
     private final BillingCreateService billingCreateService;
+    private final EnergyCustomerSyncService energyCustomerSyncService;
     private final DummyBatchService dummyBatchService;
 
     @Async("batchTaskExecutor")
@@ -39,6 +41,8 @@ public class BatchRunnerService {
                         dummyBatchService.runDummy(batchType);
                 case BatchLog.TYPE_BILLING_CREATE ->
                         billingCreateService.createMonthly(req.billingMonth(), req.roundNo(), req.strategy());
+                case BatchLog.TYPE_ENERGY_CUSTOMER_SYNC ->
+                        energyCustomerSyncService.sync();
                 default ->
                         log.warn("[batch] unhandled batchType={}", batchType);
             }
