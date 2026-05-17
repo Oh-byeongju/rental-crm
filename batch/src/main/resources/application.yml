@@ -32,6 +32,17 @@ spring:
     show-sql: true
     open-in-view: false
 
+  # ===== Kafka (producer only — batch 는 발행만, rental.billing.created) =====
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+
 # ===== Server =====
 # 9092 = Kafka broker 충돌. 9093 사용.
 server:

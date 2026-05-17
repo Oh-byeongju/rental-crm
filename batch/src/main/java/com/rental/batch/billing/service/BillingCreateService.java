@@ -1,6 +1,7 @@
 package com.rental.batch.billing.service;
 
 import com.rental.batch.billing.strategy.BillingInsertStrategy;
+import com.rental.batch.common.kafka.BillingEventPublisher;
 import com.rental.domain.billing.entity.BatchLog;
 import com.rental.domain.contract.entity.Contract;
 import com.rental.domain.contract.repository.ContractRepository;
@@ -27,13 +28,16 @@ public class BillingCreateService {
 
     private final ContractRepository contractRepository;
     private final BatchLogManager batchLogManager;
+    private final BillingEventPublisher billingEventPublisher;
     private final Map<String, BillingInsertStrategy> strategiesByName;
 
     public BillingCreateService(ContractRepository contractRepository,
                                 BatchLogManager batchLogManager,
+                                BillingEventPublisher billingEventPublisher,
                                 List<BillingInsertStrategy> strategies) {
         this.contractRepository = contractRepository;
         this.batchLogManager = batchLogManager;
+        this.billingEventPublisher = billingEventPublisher;
         this.strategiesByName = strategies.stream()
                 .collect(java.util.stream.Collectors.toUnmodifiableMap(
                         BillingInsertStrategy::name, s -> s));
@@ -60,6 +64,9 @@ public class BillingCreateService {
 
             batchLogManager.complete(batchLogId, active.size(), success, active.size() - success);
             log.info("[billing-create] R{} done — target={} success={}", roundNo, active.size(), success);
+
+            // Ch.3 — batch durable 완료(strategy+batchLog commit) 후에만 발행. 실패 시 catch 로 미발행.
+            billingEventPublisher.publishBillingCreated(billingMonth, success);
         } catch (RuntimeException e) {
             log.error("[billing-create] R{} failed — month={} strategy={}",
                       roundNo, billingMonth, strategyName, e);

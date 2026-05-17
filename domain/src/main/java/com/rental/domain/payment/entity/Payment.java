@@ -28,7 +28,7 @@ import java.util.Set;
  *   <li>PAYMENT_METHOD: CM_CODE 그룹 PAYMENT_METHOD (CARD / BANK / CASH / TOSS)</li>
  *   <li>Toss Payments 연동 컬럼 — TOSS_ORDER_ID (UNIQUE, NULL 가능) + TOSS_PAYMENT_KEY. METHOD='TOSS' 일 때만</li>
  *   <li>상태 전이: COMPLETED → CANCELLED / COMPLETED → REFUNDED. 환불은 Toss API 호출 후 트리거</li>
- *   <li>Kafka 토픽 발행: 등록 시 `rental.payment.completed`, 취소 시 `rental.payment.cancelled` (Ch.3 작업 시 추가)</li>
+ *   <li>Kafka 토픽 발행: 등록 시 `rental.payment.completed` 구현됨 (ADR-015). 취소 시 `rental.payment.cancelled` 은 04 §0-3 미정의 — 후속</li>
  * </ul>
  */
 @Entity

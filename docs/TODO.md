@@ -32,8 +32,8 @@
   - [x] **7-C-2** — 대규모 리팩터 (`BatchLogManager` REQUIRES_NEW + R1~R3 strategy 자체 tx) + R4 chunk-commit 측정 (27,876 ms). **R4 가 가장 느림** — LGWR 50회 commit 비용. 학습: chunk commit 의 진짜 가치는 성능 X, R5 UNDO 폭주에서 진가. 리포트: [`docs/perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md`](perf-reports/2026-05-13-billing-create-r1-r2-r3-r4.md)
   - [x] **7-C-3** — R5 UNDO 폭주 + R6 멱등성 **완료** (2026-05-17). R5: single-save ORA-30036 FAILED + 거짓 COMPLETED 버그 수정 ([`r5-undo`](perf-reports/2026-05-17-billing-create-r5-undo.md)). R6: 3안 모두 멱등 정확, **MERGE 가 catch-continue/select-insert 대비 ~33배** (8.9s vs 296·306s) — 비용은 충돌 처리 방식이 아니라 라운드트립 수 ([`r6-idempotency`](perf-reports/2026-05-17-billing-create-r6-idempotency.md)). 잔여 탐색(R5 §4 "R1 실패/R4 통과 UNDO 임계", 절대값 clean 재측정)은 99 §다음 작업에 보존.
 - [x] **Step 8** — UNDO 폭주 재현 환경 — R5(7-C-3)가 `undo_small` 2M 로 ORA-30036 이미 재현. 별도 환경 작업 불요 (잔여 임계 탐색은 99 §다음 작업 선택 항목).
-- [ ] **Step 9** — Ch.3 Kafka 통신 도입 (일부 토픽 비동기화 + Producer/Consumer 학습) ← **다음 주 학습 본체**
-- [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계)
+- [x] **Step 9** — **Ch.3 Kafka 이벤트 드리븐 도입 완료** (2026-05-17, [ADR-015](decisions/ADR-015-kafka-event-driven-introduction.md)). 04 §0-3 권위 스펙 구현 — 3흐름: `payment.completed`(backoffice AFTER_COMMIT producer→연체 자동해제+알림) / `billing.created`(**batch** producer→backoffice 알림, 교차모듈/양방향) / `visit.assigned`(코드완성, 활성기사 시드 0 → 런타임 보류). 멱등=**자연 멱등 신규 DDL 0** (existsBy 가드 + no-op-on-repeat, 메시지 key=멱등키 동일파티션 직렬) / offset=manual ack 성공후. 신규 전역룰 [`kafka-event-contract.md`](global-rules/kafka-event-contract.md). **런타임 검증**: 수납등록→pub(key=151002)/con→알림1+billing PAID; 배치 더블 트리거→billing.created 2회 수신·**알림 BILLING_CREATED 1건 불변**(멱등 skip). `payment.overdue`(OVERDUE_UPDATE 배치 미구현)·`payment.cancelled`(04 §0-3 외)·outbox·DLT = LATER. 리포트 불요(측정 챕터 아님).
+- [ ] **Step 10** — 도메인별 배치 메뉴 확장 (에너지 고객 동기 / 회계 정보 갱신 / 통계 집계) ← **다음 학습 본체**
 
 ---
 

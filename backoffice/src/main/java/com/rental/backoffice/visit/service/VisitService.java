@@ -12,8 +12,10 @@ import com.rental.backoffice.visit.dto.VisitResponse;
 import com.rental.backoffice.visit.dto.VisitSearchRequest;
 import com.rental.backoffice.visit.dto.VisitUpdateRequest;
 import com.rental.domain.visit.entity.Visit;
+import com.rental.domain.visit.event.VisitAssignedEvent;
 import com.rental.domain.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,7 @@ public class VisitService {
     private final VisitRepository visitRepository;
     private final ContractRepository contractRepository;
     private final EngineerRepository engineerRepository;
+    private final ApplicationEventPublisher events;
 
     // ===================== Create =====================
     @Transactional
@@ -79,6 +82,12 @@ public class VisitService {
                 .memo(req.memo())
                 .build();
         Visit saved = visitRepository.save(visit);
+
+        // Ch.3 — tx commit 후 KafkaEventPublisher 가 rental.visit.assigned 전송
+        // (kafka-event-contract.md §4 / 04 §0-3). Consumer: 알림 INSERT.
+        events.publishEvent(new VisitAssignedEvent(
+                saved.getVisitId(), saved.getEngineerId(), saved.getContractId()));
+
         return VisitResponse.from(saved, contract, engineer);
     }
 

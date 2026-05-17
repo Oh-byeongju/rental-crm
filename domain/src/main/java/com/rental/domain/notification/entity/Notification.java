@@ -34,6 +34,12 @@ public class Notification extends BaseAuditEntity {
     public static final String READ_YES = "Y";
     public static final String READ_NO  = "N";
 
+    /** NOTIFICATION_TYPE (CM_CODE 그룹) — Kafka Consumer 가 토픽별로 사용. */
+    public static final String TYPE_BILLING_CREATED   = "BILLING_CREATED";
+    public static final String TYPE_PAYMENT_COMPLETED = "PAYMENT_COMPLETED";
+    public static final String TYPE_PAYMENT_OVERDUE   = "PAYMENT_OVERDUE";
+    public static final String TYPE_VISIT_ASSIGNED    = "VISIT_ASSIGNED";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cm_notification")
     @SequenceGenerator(name = "seq_cm_notification", sequenceName = "SEQ_CM_NOTIFICATION", allocationSize = 50)

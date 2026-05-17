@@ -12,8 +12,10 @@ import com.rental.backoffice.payment.dto.PaymentCreateRequest;
 import com.rental.backoffice.payment.dto.PaymentResponse;
 import com.rental.backoffice.payment.dto.PaymentSearchRequest;
 import com.rental.domain.payment.entity.Payment;
+import com.rental.domain.payment.event.PaymentCompletedEvent;
 import com.rental.domain.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,9 @@ import java.util.stream.Collectors;
  *   <li>응답 매핑: 청구 + 고객 정보 (service-mapping-pattern.md)</li>
  * </ul>
  *
- * <p>⚠️ Ch.3 Kafka Producer 호출 (rental.payment.completed / rental.payment.cancelled) 는 후속 추가.
- * Toss Payments 결제 콜백 API 도 Phase 2 고객 포털 작업 시.
+ * <p>{@code rental.payment.completed} 발행 = 구현됨 (ADR-015 — register 가 도메인 이벤트
+ * 발행, {@code KafkaEventPublisher} 가 AFTER_COMMIT 전송). {@code rental.payment.cancelled}
+ * 은 04 §0-3 외 토픽 — 청구 복원 정책 미결로 후속. Toss 콜백 API 는 Phase 2 고객 포털.
  */
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,7 @@ public class PaymentService {
     private final BillingRepository billingRepository;
     private final BillingService billingService;
     private final CustomerRepository customerRepository;
+    private final ApplicationEventPublisher events;
 
     // ===================== Create =====================
     @Transactional
@@ -115,7 +119,10 @@ public class PaymentService {
         // 7. 청구 PAID 전환 (BillingService 협력)
         billingService.markPaid(billing.getBillingId());
 
-        // TODO: Ch.3 — Kafka Producer 발행 `rental.payment.completed` (멱등성 키: paymentNo)
+        // Ch.3 — 도메인 이벤트 발행. tx commit 후 KafkaEventPublisher 가 rental.payment.completed
+        // 전송 (kafka-event-contract.md §4). Consumer: 연체 자동해제 + 알림 INSERT.
+        events.publishEvent(new PaymentCompletedEvent(
+                billing.getBillingId(), billing.getCustomerId(), saved.getPaymentAmount()));
 
         Customer customer = customerRepository.findById(billing.getCustomerId()).orElse(null);
         return PaymentResponse.from(saved, billing, customer);
@@ -161,7 +168,7 @@ public class PaymentService {
         }
         payment.cancel(req.reason());
         // TODO: 청구 상태 복원 정책 결정 — PAID → UNPAID/OVERDUE 자동 vs 수동
-        // TODO: Ch.3 — Kafka Producer 발행 `rental.payment.cancelled`
+        // TODO: rental.payment.cancelled 발행 — 04 §0-3 외 토픽. 위 복원 정책 확정 후 (ADR-015 후속, Ch.3 범위 아님)
         return toResponse(payment);
     }
 

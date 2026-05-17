@@ -11,6 +11,12 @@ import org.springframework.data.repository.query.Param;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     /**
+     * Kafka Consumer 멱등 가드 — 동일 (유형, 참조타입, 참조ID) 알림이 이미 있으면 skip.
+     * kafka-event-contract.md §5 / api-safety §2-3 (가드+INSERT 동일 tx).
+     */
+    boolean existsByNotificationTypeAndRefTypeAndRefId(String notificationType, String refType, Long refId);
+
+    /**
      * 사용자별 미읽음 카운트 — 헤더 알림 뱃지 표시용.
      * NULL recipient (broadcast) 포함. IDX_CM_NOTIFICATION_UNREAD (READ_YN, CREATED_AT DESC) 활용.
      */

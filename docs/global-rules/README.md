@@ -21,13 +21,13 @@
 | DB 컨벤션 | 신규 테이블 / 컬럼 / 시퀀스 / 인덱스 설계 시 — DB 메타 룰 (타입·명명·기본값). `*_YN` VARCHAR(1) | [db-conventions.md](db-conventions.md) |
 | DB 캐시 사용 패턴 | DB 스키마 / 시드 조회 시 — `docs/cache/` 텍스트 캐시 우선 (DB 직접 조회 금지) | [db-cache-pattern.md](db-cache-pattern.md) |
 | 프론트엔드 그리드 라이브러리 | 신규 화면에 그리드(데이터 테이블) 사용 시 — 채택 가능 라이브러리 + 라이선스 제약 (Webix 금지) | [frontend-grid-library.md](frontend-grid-library.md) |
+| Kafka 이벤트 계약 | Kafka Producer / Consumer 작성·확장 시 — 토픽 명명·페이로드·멱등키·발행 시점·offset 정책 | [kafka-event-contract.md](kafka-event-contract.md) |
 
 ---
 
 ## 후보 (작업 시점에 추가될 가능성)
 
 - API 응답 공통 포맷 (`{ code, message, data }`) — backoffice 발행 / portal 소비 → 둘 다 영향
-- Kafka 토픽 명명 / 페이로드 스키마 — 발행자(backoffice) / 소비자(backoffice) 양쪽 영향
 - ERD 변경 절차 — docs 산출물 / backoffice 엔티티 둘 다 영향
 - 에러 코드 체계 — backoffice / portal 둘 다 사용
 

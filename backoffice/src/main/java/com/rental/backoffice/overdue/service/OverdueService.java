@@ -80,11 +80,27 @@ public class OverdueService {
         return toResponse(overdue);
     }
 
-    // ===================== Ch.3 작업 시 추가 =====================
+    // ===================== Ch.3 — 수납 완료 자동 해제 (Kafka Consumer) =====================
+
+    /**
+     * 수납 완료 시 연체 자동 해제 — {@code rental.payment.completed} Consumer 가 호출.
+     *
+     * <p>자연 멱등: 연체 레코드 없음(애초에 미연체) / 이미 해결 → no-op. Kafka 재전송 안전
+     * (kafka-event-contract.md §5, api-safety §2-1 상태 재조회). 변경분은 dirty checking 으로 flush.
+     */
+    @Transactional
+    public void resolveByPayment(Long billingId) {
+        overdueRepository.findByBillingId(billingId).ifPresent(o -> {
+            if (!o.isResolved()) {
+                o.resolve("수납 완료 자동 해제 (Kafka rental.payment.completed)");
+            }
+        });
+    }
+
+    // ===================== 배치 진입점 (OVERDUE_UPDATE — 별도 시나리오, 미구현) =====================
 
     // TODO: upsert(billingId, customerId, amount, days) — OVERDUE_UPDATE 배치 진입점
     //   - findByBillingId 후 존재하면 updateDays / reopen, 없으면 INSERT
-    // TODO: resolveByPayment(billingId) — PaymentService.register 후 자동 호출. 수납 완료로 자동 해제.
 
     // ===================== Private =====================
 
